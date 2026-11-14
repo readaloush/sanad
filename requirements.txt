@@ -1,0 +1,6 @@
+torch>=2.2
+numpy
+pandas
+datasets
+sentence-transformers
+rank_bm25
