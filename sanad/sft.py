@@ -59,6 +59,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="ALLaM-AI/ALLaM-7B-Instruct-preview")
     ap.add_argument("--retriever", default="intfloat/multilingual-e5-base")
+    ap.add_argument("--fusion", choices=["dense", "hybrid"], default="dense")
     ap.add_argument("--data", default="data")
     ap.add_argument("--out", default="results/lora")
     ap.add_argument("--n", type=int, default=1600)
@@ -78,9 +79,11 @@ def main():
     pids = list(d.passages)
     texts = [d.passages[p].text for p in pids]
     train_q = d.questions["train"]
-    bm = BM25(pids, texts)
     dense = Dense(a.retriever, pids, texts)
-    ranked = dict(zip([q.qid for q in train_q], rrf(bm.search([q.text for q in train_q]), dense.search([q.text for q in train_q]))))
+    runs = dense.search([q.text for q in train_q])
+    if a.fusion == "hybrid":
+        runs = rrf(BM25(pids, texts).search([q.text for q in train_q]), runs)
+    ranked = dict(zip([q.qid for q in train_q], runs))
     del dense
     torch.cuda.empty_cache()
 

@@ -95,6 +95,8 @@ def main():
     ap.add_argument("--models", nargs="+", default=["ALLaM-AI/ALLaM-7B-Instruct-preview", "Qwen/Qwen2.5-7B-Instruct"])
     ap.add_argument("--adapter", default=None, help="LoRA adapter for the first model")
     ap.add_argument("--retriever", default="intfloat/multilingual-e5-base")
+    ap.add_argument("--fusion", choices=["dense", "hybrid"], default="dense",
+                    help="dense: the embedding model alone (best on human-written questions); hybrid: fused with BM25")
     ap.add_argument("--data", default="data")
     ap.add_argument("--out", default="results")
     ap.add_argument("--tag", default="")
@@ -116,17 +118,18 @@ def main():
     }
     gen_sets = {"najiz": d.questions["najiz"], "test": sets["test"][:a.n_gen]}
 
-    bm = BM25(pids, texts)
     dense = Dense(a.retriever, pids, texts)
     need = {q.qid: q for qs in list(sets.values()) + list(gen_sets.values()) for q in qs}
     order = list(need)
-    ranked_all = rrf(bm.search([need[i].text for i in order]), dense.search([need[i].text for i in order]))
+    ranked_all = dense.search([need[i].text for i in order])
+    if a.fusion == "hybrid":
+        ranked_all = rrf(BM25(pids, texts).search([need[i].text for i in order]), ranked_all)
     ranked = dict(zip(order, ranked_all))
     del dense
     gc.collect()
 
     import torch
-    report = {"retriever": f"BM25 + {a.retriever} (RRF)", "adapter": a.adapter, "models": {}}
+    report = {"retriever": a.retriever + (" + BM25 (RRF)" if a.fusion == "hybrid" else ""), "adapter": a.adapter, "models": {}}
     samples = {}
     for mi, m in enumerate(a.models):
         model, tok = load(m, a.adapter if mi == 0 else None)
