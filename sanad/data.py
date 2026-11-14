@@ -58,6 +58,10 @@ def fetch_arablegaleval(root: Path) -> Path:
 def _article_fields(entry) -> tuple[str, str, str]:
     """(law, article, text) from one ALARB applicable_laws entry, whatever its exact key names."""
     if isinstance(entry, str):
+        # ALARB stores each article as "law name:article number: article text"
+        parts = entry.split(":", 2)
+        if len(parts) == 3 and len(parts[0]) < 120 and len(parts[1].strip()) < 20:
+            return parts[0].strip(), parts[1].strip(), parts[2].strip()
         return "", "", entry
     if not isinstance(entry, dict):
         return "", "", str(entry)
