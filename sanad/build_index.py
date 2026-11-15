@@ -3,6 +3,9 @@
     python -m sanad.build_index --out artifacts            # ALARB statute articles only (Apache-2.0)
     python -m sanad.build_index --out artifacts --all      # every passage, for private use only
 
+The service uses text.onnx (float32). text.int8.onnx is written too, but measure it with sanad.onnx_eval first:
+the first int8 export lost 13 points of Recall@1 on human questions.
+
 By default the served corpus is the statute articles cited in ALARB court cases, which carry the
 law's name and the article number and are under Apache-2.0, so the index can be shared. The
 ArabLegalEval passages have no stated licence and are left out unless --all is given.
@@ -45,7 +48,10 @@ def export(st, out: Path) -> dict:
             torch.onnx.export(Wrapper(st), (feats["input_ids"], feats["attention_mask"]), str(out / "text.onnx"), dynamo=False, **kw)
         except TypeError:
             torch.onnx.export(Wrapper(st), (feats["input_ids"], feats["attention_mask"]), str(out / "text.onnx"), **kw)
-    quantize_dynamic(str(out / "text.onnx"), str(out / "text.int8.onnx"), weight_type=QuantType.QInt8)
+    # int8 weights for the matrix multiplications only, one scale per output channel. Quantising every op with one
+    # scale per tensor (quantize_dynamic's default) cost 13 points of Recall@1 on the Najiz questions (notebook 7).
+    quantize_dynamic(str(out / "text.onnx"), str(out / "text.int8.onnx"), weight_type=QuantType.QInt8,
+                     per_channel=True, op_types_to_quantize=["MatMul"])
     return {f: round((out / f).stat().st_size / 1e6, 1) for f in ("text.onnx", "text.int8.onnx")}
 
 
@@ -68,14 +74,14 @@ def main():
     st = SentenceTransformer(a.model, device="cuda" if torch.cuda.is_available() else "cpu")
     st.max_seq_length = 256
     sizes = export(st, out)
-    enc = TextEncoder(out / "text.int8.onnx", out / "tokenizer.json")
+    enc = TextEncoder(out / "text.onnx", out / "tokenizer.json")
     emb = enc([PASSAGE_PREFIX + p.text for p in ps])
     np.save(out / "corpus.npy", emb.astype(np.float16))
     (out / "corpus.json").write_text(json.dumps([{"id": p.pid, "law": p.law, "article": p.article, "text": p.text} for p in ps],
                                                 ensure_ascii=False))
     ref = st.encode([PASSAGE_PREFIX + p.text for p in ps[:64]], normalize_embeddings=True)
     print(f"{len(ps)} passages ({sum(bool(p.law) for p in ps)} with law name and article number); onnx sizes MB {sizes}; "
-          f"int8 vs PyTorch cosine on 64 passages: min {float((ref * emb[:64]).sum(1).min()):.4f}")
+          f"ONNX vs PyTorch cosine on 64 passages: min {float((ref * emb[:64]).sum(1).min()):.4f}")
 
 
 if __name__ == "__main__":

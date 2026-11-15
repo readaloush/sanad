@@ -32,6 +32,7 @@ def main():
     ap.add_argument("--model", default="intfloat/multilingual-e5-base")
     ap.add_argument("--data", default="data")
     ap.add_argument("--out", default="results/onnx_eval.json")
+    ap.add_argument("--lengths", default="512,256", help="token limits for the PyTorch reference runs")
     a = ap.parse_args()
 
     from sentence_transformers import SentenceTransformer
@@ -44,7 +45,7 @@ def main():
 
     st = SentenceTransformer(a.model, device="cpu")
     encoders = {}
-    for n in (512, 256):
+    for n in [int(x) for x in a.lengths.split(",") if x]:
         def f(texts, n=n):
             st.max_seq_length = n
             return st.encode(texts, batch_size=32, normalize_embeddings=True, convert_to_numpy=True)
