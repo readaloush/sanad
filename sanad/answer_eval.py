@@ -85,6 +85,9 @@ def grounded_eval(model, tok, qs, ranked, text, k=3) -> tuple[dict, list]:
         "false_abstain": float(np.mean(false_abstain)) if false_abstain else 0.0,
         "abstains_when_unanswerable": float(np.mean([abstained(a) for a in un])) if un else 0.0,
     }
+    fa = [(q, a) for a, (q, gidx, top) in zip(ans, ans_meta) if abstained(a)]
+    for q, a in fa[:6]:
+        print(f"  said 'not found' although the passage is in the context: {q.text}", flush=True)
     for a, q in list(zip(un, qs))[:20]:
         rows.append({"qid": q.qid, "question": q.text, "answer": a, "unanswerable": True})
     return res, rows

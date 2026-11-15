@@ -6,6 +6,9 @@ Two training sets are compared, both starting from the same model:
 
   questions         ArabLegalEval training questions, each paired with the passage it was written from
   questions+cases   the same, plus ALARB court cases: the facts of a case paired with each article it cites
+  original-subset   only the training questions that also have a rewrite (sanad.rewrite), original wording
+  rewrites          the same questions in the rewritten, plain-language wording
+  original+rewrites both
 
 Each pair gets one hard negative: the highest-ranked wrong passage from the starting model.
 Loss: in-batch negatives (cached multiple-negatives ranking), so every other passage in a batch of
@@ -63,6 +66,7 @@ def main():
     ap.add_argument("--lr", type=float, default=2e-5)
     ap.add_argument("--max-len", type=int, default=256)
     ap.add_argument("--recipes", default="questions,questions+cases")
+    ap.add_argument("--rewrites", default="", help="results/rewrites.json from sanad.rewrite, for the rewrites recipes")
     ap.add_argument("--no-alarb", action="store_true", help="for a quick local check only")
     ap.add_argument("--limit", type=int, default=0, help="cap on training pairs, for a quick local check only")
     a = ap.parse_args()
@@ -93,6 +97,13 @@ def main():
     q_neg = mine(base, [q.text for q in train_q], [{q.gold} for q in train_q])
     pairs_q = [(qp + q.text, pp + text[q.gold], pp + text[n]) for q, n in zip(train_q, q_neg)]
 
+    rw = json.loads(Path(a.rewrites).read_text()) if a.rewrites else {}
+    rw_q = [q for q in train_q if q.qid in rw]
+    rw_neg = mine(base, [rw[q.qid] for q in rw_q], [{q.gold} for q in rw_q], seed=2) if rw_q else []
+    pairs_r = [(qp + rw[q.qid], pp + text[q.gold], pp + text[n]) for q, n in zip(rw_q, rw_neg)]
+    rw_ids = {q.qid for q in rw_q}
+    pairs_q_matched = [p for p, q in zip(pairs_q, train_q) if q.qid in rw_ids]
+
     cases = [(f, [p for p in ps if p not in held]) for f, ps in d.alarb_pairs]
     cases = [(f, ps) for f, ps in cases if ps and f.strip()]
     dropped = sum(1 for f, ps in d.alarb_pairs if any(p in held for p in ps))
@@ -100,7 +111,8 @@ def main():
     case_neg = mine(base, case_q, [set(ps) for _, ps in cases], seed=1)
     rng = random.Random(0)
     pairs_c = [(qp + f, pp + text[rng.choice(ps)], pp + text[n]) for f, (_, ps), n in zip(case_q, cases, case_neg)]
-    report["training_pairs"] = {"questions": len(pairs_q), "cases": len(pairs_c), "cases_dropped_for_touching_held_out_passages": dropped}
+    report["training_pairs"] = {"questions": len(pairs_q), "cases": len(pairs_c), "rewrites": len(pairs_r),
+                                "cases_dropped_for_touching_held_out_passages": dropped}
     print(json.dumps(report["training_pairs"]), flush=True)
     del base
     gc.collect()
@@ -108,7 +120,9 @@ def main():
 
     best_name, best_dev = "starting model", report["runs"]["starting model"]["dev"]["dense"]["MRR@10"]
     for recipe in a.recipes.split(","):
-        pairs = pairs_q + (pairs_c if recipe == "questions+cases" else [])
+        pairs = {"questions": pairs_q, "questions+cases": pairs_q + pairs_c,
+                 # same questions, original wording vs rewritten, so the comparison isolates the wording
+                 "original-subset": pairs_q_matched, "rewrites": pairs_r, "original+rewrites": pairs_q_matched + pairs_r}[recipe]
         random.Random(1).shuffle(pairs)
         if a.limit:
             pairs = pairs[:a.limit]

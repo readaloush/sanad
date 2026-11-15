@@ -5,9 +5,9 @@
 QLoRA (4-bit base model, rank-16 adapters on every linear layer of the transformer blocks).
 Each training example is an ArabLegalEval training question with the top 3 retrieved passages:
 
-  75%  the gold passage is in the context (put there if the retriever missed it);
+  1 - p  the gold passage is in the context (put there if the retriever missed it);
        target: the short correct answer followed by the number of that passage, e.g. "خلال خمسة أيام [2]"
-  25%  the gold passage is removed from the context;
+  p      the gold passage is removed from the context (p = --p-unanswerable, 0.25 by default);
        target: the fixed "not found" sentence
 
 No dev, test or Najiz question or passage is used.
@@ -34,11 +34,11 @@ def clip(t: str) -> str:
     return t if len(t) <= TRAIN_CHARS else t[:TRAIN_CHARS] + "…"
 
 
-def examples(d, ranked, n, p_unanswerable=0.25, k=3, seed=0):
+def examples(d, ranked, n, p_unanswerable=0.25, k=3, seed=0, rewrites=None):
     rng = random.Random(seed)
     held = {q.gold for s in ("dev", "test", "najiz") for q in d.questions[s]}
     text = {p: d.passages[p].text for p in d.passages}
-    qs = [q for q in d.questions["train"] if q.answer.strip()]
+    qs = [q for q in d.questions["train"] if q.answer.strip() and (not rewrites or q.qid in rewrites)]
     rng.shuffle(qs)
     out = []
     for q in qs[:n]:
@@ -51,7 +51,8 @@ def examples(d, ranked, n, p_unanswerable=0.25, k=3, seed=0):
             if q.gold not in ctx:
                 ctx[rng.randrange(k)] = q.gold
             target = f"{q.answer.strip()} [{ctx.index(q.gold) + 1}]"
-        out.append((rag_messages(q.text, [clip(text[p]) for p in ctx]), target))
+        question = rewrites[q.qid] if rewrites else q.text
+        out.append((rag_messages(question, [clip(text[p]) for p in ctx]), target))
     return out
 
 
@@ -68,6 +69,8 @@ def main():
     ap.add_argument("--accum", type=int, default=8)
     ap.add_argument("--max-len", type=int, default=1280)
     ap.add_argument("--rank", type=int, default=16)
+    ap.add_argument("--p-unanswerable", type=float, default=0.25)
+    ap.add_argument("--rewrites", default="", help="train on the plain-language rewrites from sanad.rewrite instead of the original questions")
     a = ap.parse_args()
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -78,16 +81,18 @@ def main():
     d = build(a.data)
     pids = list(d.passages)
     texts = [d.passages[p].text for p in pids]
-    train_q = d.questions["train"]
+    rw = json.loads(Path(a.rewrites).read_text()) if a.rewrites else None
+    train_q = [q for q in d.questions["train"] if not rw or q.qid in rw]
+    asked = [rw[q.qid] if rw else q.text for q in train_q]   # retrieve with the wording the model will be trained on
     dense = Dense(a.retriever, pids, texts)
-    runs = dense.search([q.text for q in train_q])
+    runs = dense.search(asked)
     if a.fusion == "hybrid":
-        runs = rrf(BM25(pids, texts).search([q.text for q in train_q]), runs)
+        runs = rrf(BM25(pids, texts).search(asked), runs)
     ranked = dict(zip([q.qid for q in train_q], runs))
     del dense
     torch.cuda.empty_cache()
 
-    ex = examples(d, ranked, a.n)
+    ex = examples(d, ranked, a.n, p_unanswerable=a.p_unanswerable, rewrites=rw)
     tok = AutoTokenizer.from_pretrained(a.model)
     if tok.pad_token is None:
         tok.pad_token = tok.eos_token
@@ -145,6 +150,7 @@ def main():
     model.save_pretrained(str(out))
     tok.save_pretrained(str(out))
     (out / "train.json").write_text(json.dumps({"base": a.model, "examples": len(data), "epochs": a.epochs, "lr": a.lr,
+                                                "p_unanswerable": a.p_unanswerable, "rewrites": bool(rw),
                                                 "rank": a.rank, "steps": steps, "minutes": round((time.time() - t0) / 60, 1),
                                                 "final_loss": sum(running[-80:]) / max(1, len(running[-80:]))}, indent=1))
     print("saved adapter to", out)
