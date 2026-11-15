@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="475.2pt" height="280.8pt" viewBox="0 0 475.2 280.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-11-15T22:46:18.416054</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 280.8 
+L 475.2 280.8 
+L 475.2 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 58.64 237.58 
+L 465.48 237.58 
+L 465.48 14.22 
+L 58.64 14.22 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <path d="M 58.64 237.58 
+L 58.64 14.22 
+" clip-path="url(#p69deb68126)" style="fill: none; stroke: #e3e8e5; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_2">
+      <defs>
+       <path id="m2c4d6faf54" d="M 0 0 
+L 0 3.5 
+" style="stroke: #55666b; stroke-width: 0.8"/>
+      </defs>
+      <g>
+       <use xlink:href="#m2c4d6faf54" x="58.64" y="237.58" style="fill: #55666b; stroke: #55666b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_1">
+      <text style="font-size: 9px; font-family: 'Readex Pro'; text-anchor: middle; fill: #55666b" x="58.64" y="253.58" transform="rotate(-0 58.64 253.58)">0</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_3">
+      <path d="M 121.230769 237.58 
+L 121.230769 14.22 
+" clip-path="url(#p69deb68126)" style="fill: none; stroke: #e3e8e5; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_4">
+      <g>
+       <use xlink:href="#m2c4d6faf54" x="121.230769" y="237.58" style="fill: #55666b; stroke: #55666b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_2">
+      <text style="font-size: 9px; font-family: 'Readex Pro'; text-anchor: middle; fill: #55666b" x="121.230769" y="253.58" transform="rotate(-0 121.230769 253.58)">10</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_5">
+      <path d="M 183.821538 237.58 
+L 183.821538 14.22 
+" clip-path="url(#p69deb68126)" style="fill: none; stroke: #e3e8e5; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_6">
+      <g>
+       <use xlink:href="#m2c4d6faf54" x="183.821538" y="237.58" style="fill: #55666b; stroke: #55666b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_3">
+      <text style="font-size: 9px; font-family: 'Readex Pro'; text-anchor: middle; fill: #55666b" x="183.821538" y="253.58" transform="rotate(-0 183.821538 253.58)">20</text>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_7">
+      <path d="M 246.412308 237.58 
+L 246.412308 14.22 
+" clip-path="url(#p69deb68126)" style="fill: none; stroke: #e3e8e5; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_8">
+      <g>
+       <use xlink:href="#m2c4d6faf54" x="246.412308" y="237.58" style="fill: #55666b; stroke: #55666b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_4">
+      <text style="font-size: 9px; font-family: 'Readex Pro'; text-anchor: middle; fill: #55666b" x="246.412308" y="253.58" transform="rotate(-0 246.412308 253.58)">30</text>
+     </g>
+    </g>
+    <g id="xtick_5">
+     <g id="line2d_9">
+      <path d="M 309.003077 237.58 
+L 309.003077 14.22 
+" clip-path="url(#p69deb68126)" style="fill: none; stroke: #e3e8e5; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_10">
+      <g>
+       <use xlink:href="#m2c4d6faf54" x="309.003077" y="237.58" style="fill: #55666b; stroke: #55666b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_5">
+      <text style="font-size: 9px; font-family: 'Readex Pro'; text-anchor: middle; fill: #55666b" x="309.003077" y="253.58" transform="rotate(-0 309.003077 253.58)">40</text>
+     </g>
+    </g>
+    <g id="xtick_6">
+     <g id="line2d_11">
+      <path d="M 371.593846 237.58 
+L 371.593846 14.22 
+" clip-path="url(#p69deb68126)" style="fill: none; stroke: #e3e8e5; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_12">
+      <g>
+       <use xlink:href="#m2c4d6faf54" x="371.593846" y="237.58" style="fill: #55666b; stroke: #55666b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_6">
+      <text style="font-size: 9px; font-family: 'Readex Pro'; text-anchor: middle; fill: #55666b" x="371.593846" y="253.58" transform="rotate(-0 371.593846 253.58)">50</text>
+     </g>
+    </g>
+    <g id="xtick_7">
+     <g id="line2d_13">
+      <path d="M 434.184615 237.58 
+L 434.184615 14.22 
+" clip-path="url(#p69deb68126)" style="fill: none; stroke: #e3e8e5; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_14">
+      <g>
+       <use xlink:href="#m2c4d6faf54" x="434.184615" y="237.58" style="fill: #55666b; stroke: #55666b; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_7">
+      <text style="font-size: 9px; font-family: 'Readex Pro'; text-anchor: middle; fill: #55666b" x="434.184615" y="253.58" transform="rotate(-0 434.184615 253.58)">60</text>
+     </g>
+    </g>
+    <g id="text_8">
+     <text style="font-size: 9px; font-family: 'Readex Pro'; text-anchor: middle; fill: #55666b" x="262.06" y="268.83" transform="rotate(-0 262.06 268.83)">Says “not found” although the answer is there (%), lower is better</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_15">
+      <path d="M 58.64 237.58 
+L 465.48 237.58 
+" clip-path="url(#p69deb68126)" style="fill: none; stroke: #e3e8e5; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_16">
+      <defs>
+       <path id="m5ea376e598" d="M 0 0 
+L -3.5 0 
+" style="stroke: #1b2a2f; stroke-width: 0.8"/>
+      </defs>
+      <g>
+       <use xlink:href="#m5ea376e598" x="58.64" y="237.58" style="fill: #1b2a2f; stroke: #1b2a2f; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_9">
+      <text style="font-size: 9px; font-family: 'Readex Pro'; text-anchor: end; fill: #1b2a2f" x="51.64" y="242.08" transform="rotate(-0 51.64 242.08)">0</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_17">
+      <path d="M 58.64 192.908 
+L 465.48 192.908 
+" clip-path="url(#p69deb68126)" style="fill: none; stroke: #e3e8e5; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_18">
+      <g>
+       <use xlink:href="#m5ea376e598" x="58.64" y="192.908" style="fill: #1b2a2f; stroke: #1b2a2f; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_10">
+      <text style="font-size: 9px; font-family: 'Readex Pro'; text-anchor: end; fill: #1b2a2f" x="51.64" y="197.408" transform="rotate(-0 51.64 197.408)">20</text>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_19">
+      <path d="M 58.64 148.236 
+L 465.48 148.236 
+" clip-path="url(#p69deb68126)" style="fill: none; stroke: #e3e8e5; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_20">
+      <g>
+       <use xlink:href="#m5ea376e598" x="58.64" y="148.236" style="fill: #1b2a2f; stroke: #1b2a2f; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_11">
+      <text style="font-size: 9px; font-family: 'Readex Pro'; text-anchor: end; fill: #1b2a2f" x="51.64" y="152.736" transform="rotate(-0 51.64 152.736)">40</text>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_21">
+      <path d="M 58.64 103.564 
+L 465.48 103.564 
+" clip-path="url(#p69deb68126)" style="fill: none; stroke: #e3e8e5; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_22">
+      <g>
+       <use xlink:href="#m5ea376e598" x="58.64" y="103.564" style="fill: #1b2a2f; stroke: #1b2a2f; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_12">
+      <text style="font-size: 9px; font-family: 'Readex Pro'; text-anchor: end; fill: #1b2a2f" x="51.64" y="108.064" transform="rotate(-0 51.64 108.064)">60</text>
+     </g>
+    </g>
+    <g id="ytick_5">
+     <g id="line2d_23">
+      <path d="M 58.64 58.892 
+L 465.48 58.892 
+" clip-path="url(#p69deb68126)" style="fill: none; stroke: #e3e8e5; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_24">
+      <g>
+       <use xlink:href="#m5ea376e598" x="58.64" y="58.892" style="fill: #1b2a2f; stroke: #1b2a2f; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_13">
+      <text style="font-size: 9px; font-family: 'Readex Pro'; text-anchor: end; fill: #1b2a2f" x="51.64" y="63.392" transform="rotate(-0 51.64 63.392)">80</text>
+     </g>
+    </g>
+    <g id="ytick_6">
+     <g id="line2d_25">
+      <path d="M 58.64 14.22 
+L 465.48 14.22 
+" clip-path="url(#p69deb68126)" style="fill: none; stroke: #e3e8e5; stroke-width: 0.8; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_26">
+      <g>
+       <use xlink:href="#m5ea376e598" x="58.64" y="14.22" style="fill: #1b2a2f; stroke: #1b2a2f; stroke-width: 0.8"/>
+      </g>
+     </g>
+     <g id="text_14">
+      <text style="font-size: 9px; font-family: 'Readex Pro'; text-anchor: end; fill: #1b2a2f" x="51.64" y="18.72" transform="rotate(-0 51.64 18.72)">100</text>
+     </g>
+    </g>
+    <g id="text_15">
+     <text style="font-size: 9px; font-family: 'Readex Pro'; fill: #55666b" transform="translate(18.713438 191.668203) rotate(-90)">Says “not found” when the law</text>
+     <text style="font-size: 9px; font-family: 'Readex Pro'; fill: #55666b" transform="translate(29.963438 191.1725) rotate(-90)">is missing (%), higher is better</text>
+    </g>
+   </g>
+   <g id="line2d_27">
+    <path d="M 99.324 169.67856 
+L 109.338523 150.02288 
+L 129.367569 127.24016 
+L 220.124185 90.60912 
+" clip-path="url(#p69deb68126)" style="fill: none; stroke: #55666b; stroke-width: 2; stroke-linecap: square"/>
+    <defs>
+     <path id="md11b444e9a" d="M 0 2.5 
+C 0.663008 2.5 1.29895 2.236584 1.767767 1.767767 
+C 2.236584 1.29895 2.5 0.663008 2.5 0 
+C 2.5 -0.663008 2.236584 -1.29895 1.767767 -1.767767 
+C 1.29895 -2.236584 0.663008 -2.5 0 -2.5 
+C -0.663008 -2.5 -1.29895 -2.236584 -1.767767 -1.767767 
+C -2.236584 -1.29895 -2.5 -0.663008 -2.5 0 
+C -2.5 0.663008 -2.236584 1.29895 -1.767767 1.767767 
+C -1.29895 2.236584 -0.663008 2.5 0 2.5 
+z
+" style="stroke: #55666b"/>
+    </defs>
+    <g clip-path="url(#p69deb68126)">
+     <use xlink:href="#md11b444e9a" x="99.324" y="169.67856" style="fill: #ffffff; stroke: #55666b"/>
+     <use xlink:href="#md11b444e9a" x="109.338523" y="150.02288" style="fill: #ffffff; stroke: #55666b"/>
+     <use xlink:href="#md11b444e9a" x="129.367569" y="127.24016" style="fill: #ffffff; stroke: #55666b"/>
+     <use xlink:href="#md11b444e9a" x="220.124185" y="90.60912" style="fill: #ffffff; stroke: #55666b"/>
+    </g>
+   </g>
+   <g id="line2d_28">
+    <path d="M 260.808185 70.73008 
+L 280.837231 56.6584 
+L 361.579323 42.58672 
+L 442.321415 36.77936 
+" clip-path="url(#p69deb68126)" style="fill: none; stroke: #b8862f; stroke-width: 2; stroke-linecap: square"/>
+    <defs>
+     <path id="m64b595ab59" d="M 0 2.5 
+C 0.663008 2.5 1.29895 2.236584 1.767767 1.767767 
+C 2.236584 1.29895 2.5 0.663008 2.5 0 
+C 2.5 -0.663008 2.236584 -1.29895 1.767767 -1.767767 
+C 1.29895 -2.236584 0.663008 -2.5 0 -2.5 
+C -0.663008 -2.5 -1.29895 -2.236584 -1.767767 -1.767767 
+C -2.236584 -1.29895 -2.5 -0.663008 -2.5 0 
+C -2.5 0.663008 -2.236584 1.29895 -1.767767 1.767767 
+C -1.29895 2.236584 -0.663008 2.5 0 2.5 
+z
+" style="stroke: #b8862f"/>
+    </defs>
+    <g clip-path="url(#p69deb68126)">
+     <use xlink:href="#m64b595ab59" x="260.808185" y="70.73008" style="fill: #ffffff; stroke: #b8862f"/>
+     <use xlink:href="#m64b595ab59" x="280.837231" y="56.6584" style="fill: #ffffff; stroke: #b8862f"/>
+     <use xlink:href="#m64b595ab59" x="361.579323" y="42.58672" style="fill: #ffffff; stroke: #b8862f"/>
+     <use xlink:href="#m64b595ab59" x="442.321415" y="36.77936" style="fill: #ffffff; stroke: #b8862f"/>
+    </g>
+   </g>
+   <g id="patch_3">
+    <path d="M 58.64 237.58 
+L 58.64 14.22 
+" style="fill: none; stroke: #c9d1ce; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 58.64 237.58 
+L 465.48 237.58 
+" style="fill: none; stroke: #c9d1ce; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 7.5px; font-family: 'Readex Pro'; text-anchor: start; fill: #1b2a2f" x="77.158154" y="200.3752" transform="rotate(-0 77.158154 200.3752)">released</text>
+   </g>
+   <g id="text_17">
+    <text style="font-size: 7.5px; font-family: 'Readex Pro'; fill: #1b2a2f" transform="translate(338.039385 60.1154)">25% and 18% runs</text>
+    <text style="font-size: 7.5px; font-family: 'Readex Pro'; fill: #1b2a2f" transform="translate(338.039385 69.4904)">(same point)</text>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 7.5px; font-family: 'Readex Pro'; text-anchor: start; fill: #1b2a2f" x="133.489846" y="138.8344" transform="rotate(-0 133.489846 138.8344)">12%, rewrites</text>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 7.5px; font-family: 'Readex Pro'; text-anchor: start; fill: #1b2a2f" x="297.225846" y="78.5272" transform="rotate(-0 297.225846 78.5272)">12%, answer + quote</text>
+   </g>
+   <g id="PathCollection_1">
+    <defs>
+     <path id="m5601a1ab23" d="M 0 3.391165 
+C 0.899347 3.391165 1.761981 3.03385 2.397916 2.397916 
+C 3.03385 1.761981 3.391165 0.899347 3.391165 0 
+C 3.391165 -0.899347 3.03385 -1.761981 2.397916 -2.397916 
+C 1.761981 -3.03385 0.899347 -3.391165 0 -3.391165 
+C -0.899347 -3.391165 -1.761981 -3.03385 -2.397916 -2.397916 
+C -3.03385 -1.761981 -3.391165 -0.899347 -3.391165 0 
+C -3.391165 0.899347 -3.03385 1.761981 -2.397916 2.397916 
+C -1.761981 3.03385 -0.899347 3.391165 0 3.391165 
+z
+" style="stroke: #ffffff; stroke-width: 1.5"/>
+    </defs>
+    <g clip-path="url(#p69deb68126)">
+     <use xlink:href="#m5601a1ab23" x="71.158154" y="197.3752" style="fill: #1f7a55; stroke: #ffffff; stroke-width: 1.5"/>
+     <use xlink:href="#m5601a1ab23" x="334.039385" y="45.4904" style="fill: #1f7a55; stroke: #ffffff; stroke-width: 1.5"/>
+     <use xlink:href="#m5601a1ab23" x="127.489846" y="134.8344" style="fill: #1f7a55; stroke: #ffffff; stroke-width: 1.5"/>
+     <use xlink:href="#m5601a1ab23" x="290.225846" y="74.5272" style="fill: #1f7a55; stroke: #ffffff; stroke-width: 1.5"/>
+    </g>
+   </g>
+   <g id="legend_1">
+    <g id="line2d_29">
+     <path d="M 309.03125 197.58 
+L 317.03125 197.58 
+L 325.03125 197.58 
+" style="fill: none; stroke: #55666b; stroke-width: 2; stroke-linecap: square"/>
+     <g>
+      <use xlink:href="#md11b444e9a" x="317.03125" y="197.58" style="fill: #ffffff; stroke: #55666b"/>
+     </g>
+    </g>
+    <g id="text_20">
+     <text style="font-size: 8px; font-family: 'Readex Pro'; text-anchor: start" x="331.43125" y="200.38" transform="rotate(-0 331.43125 200.38)">Released model + threshold</text>
+    </g>
+    <g id="line2d_30">
+     <path d="M 309.03125 211.58 
+L 317.03125 211.58 
+L 325.03125 211.58 
+" style="fill: none; stroke: #b8862f; stroke-width: 2; stroke-linecap: square"/>
+     <g>
+      <use xlink:href="#m64b595ab59" x="317.03125" y="211.58" style="fill: #ffffff; stroke: #b8862f"/>
+     </g>
+    </g>
+    <g id="text_21">
+     <text style="font-size: 8px; font-family: 'Readex Pro'; text-anchor: start" x="331.43125" y="214.38" transform="rotate(-0 331.43125 214.38)">QLoRA 25% + threshold</text>
+    </g>
+    <g id="PathCollection_2">
+     <g>
+      <use xlink:href="#m5601a1ab23" x="317.03125" y="226.28" style="fill: #1f7a55; stroke: #ffffff; stroke-width: 1.5"/>
+     </g>
+    </g>
+    <g id="text_22">
+     <text style="font-size: 8px; font-family: 'Readex Pro'; text-anchor: start" x="331.43125" y="228.38" transform="rotate(-0 331.43125 228.38)">Single training runs, no threshold</text>
+    </g>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p69deb68126">
+   <rect x="58.64" y="14.22" width="406.84" height="223.36"/>
+  </clipPath>
+ </defs>
+</svg>
