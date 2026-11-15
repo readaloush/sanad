@@ -2,7 +2,9 @@
 
 Question answering over Saudi law, in Arabic, with the article it rests on.
 
-Work in progress. Step 1, below, measures how well existing retrievers find the right legal text for a question ([`notebooks/01_retrieval_baselines.ipynb`](notebooks/01_retrieval_baselines.ipynb)). Next: fine-tuning the retriever, then a 7B language model that answers with citations and says so when the texts do not answer the question, then a service and a demo.
+Work in progress. Done so far: retrieval baselines (step 1), retriever fine-tuning (step 2), and a 7B language model that answers from the retrieved law with a citation and says so when the law is not there (step 3). Running: step 4, training on plain-language rewrites of the questions. Next: a service and a demo.
+
+**Main finding so far.** Training on LLM-written questions, which copy the wording of the law, makes both the retriever and the answering model better on more questions of that kind and worse in a different way on questions people actually ask. It happened twice, in two different models.
 
 Not legal advice. The system is a study of retrieval and grounded answering, not a source of legal guidance.
 
@@ -38,3 +40,46 @@ What this shows:
 - 79 questions is a small set: one question is 1.3 points, so the differences between embedding models there are not meaningful.
 
 The fine-tuning in step 2 starts from multilingual-e5-base: on human questions it matches the larger models at a third of the size, which matters for serving.
+
+## Step 2: fine-tuning the retriever
+
+multilingual-e5-base, fine-tuned with in-batch negatives and one mined hard negative per pair, 2 epochs. Recall@1 / @5 / @10 and MRR@10, the retriever alone.
+
+| Training data | Test (LLM-written) | Najiz (human-written) |
+|---|---|---|
+| none (starting model) | 74.2 / 91.0 / 94.3 / 0.815 | **63.3 / 86.1 / 87.3 / 0.715** |
+| ArabLegalEval training questions (7,325) | **82.1 / 95.1 / 97.4 / 0.876** | 58.2 / 70.9 / 81.0 / 0.648 |
+| the same + ALARB court cases (10,608 facts → cited article) | 80.5 / 94.1 / 96.9 / 0.865 | 59.5 / 67.1 / 78.5 / 0.635 |
+
+Fine-tuning gains 8 points of Recall@1 on questions like the training ones and loses on human questions: Recall@5 falls from 86.1% to 70.9%, which is 12 of 79 questions. The selection rule (best dev MRR) picks the fine-tuned model, because the dev set is LLM-written too. Steps 3 and 4 use the starting model instead, because the assistant is for people.
+
+## Step 3: the answering model
+
+Retriever: multilingual-e5-base, top 3 passages. Both models in 4-bit on a T4.
+
+**Multiple choice** (400 test questions, four options; accuracy in %):
+
+| Model | Closed book | Top 3 retrieved passages | Gold passage only |
+|---|---|---|---|
+| ALLaM-7B-Instruct | 67.3 | 93.5 | 97.8 |
+| Qwen2.5-7B-Instruct | 65.8 | 93.5 | 97.8 |
+| ALLaM-7B-Instruct + QLoRA | 67.0 | **96.5** | 98.8 |
+
+Retrieval is worth 26 points. The fine-tuning does not add legal knowledge (closed book is unchanged) but makes better use of the passages it is given. The gold passage is in the top 3 for 87% of these questions, so most remaining errors are retrieval misses.
+
+**Grounded answers** (answer in Arabic with a citation such as [2]; "unanswerable" = the same question with the gold passage removed from the context):
+
+| | Cites the gold passage | Says "not found" when the law is missing | Says "not found" although the answer is there | Answer F1 |
+|---|---|---|---|---|
+| ALLaM, test | 27% | 16% | 0% | 0.42 |
+| Qwen, test | 90% | 46% | 1% | 0.44 |
+| **ALLaM + QLoRA, test** | **93%** | **84%** | 7% | **0.80** |
+| ALLaM, Najiz | 26% | 18% | 2% | 0.46 |
+| Qwen, Najiz | 76% | 33% | 3% | 0.43 |
+| **ALLaM + QLoRA, Najiz** | 55% | **86%** | **44%** | 0.47 |
+
+QLoRA (rank 16, 1,600 examples, 25% of them with the gold passage removed and the target "not found") fixes the two failures that matter most in a legal assistant: before it, ALLaM made up an answer for 84% of questions whose law it had not been given, and rarely said where its answer came from. On LLM-written questions it now cites the right article 93% of the time.
+
+On human questions it overcorrects: it says "not found" for 44% of questions whose answer is in front of it, because people do not use the wording of the law and the model learned that missing wording means a missing answer. Step 4 retrains on plain-language rewrites with fewer "not found" examples.
+
+Najiz answer F1 understates quality: the reference answers are whole paragraphs, while the model answers in a sentence, so a correct short answer scores low.
