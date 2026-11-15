@@ -167,6 +167,19 @@ Thresholds chosen on development questions for a target false "not found" rate, 
 
 Fine-tuning makes the model much better at knowing when the answer is missing, on questions like its training data, and hardly better on questions people ask (AUC 0.78 to 0.81, within noise for 79 questions). A threshold set on LLM-written questions does not carry over: 2% false "not found" on test becomes 32% on Najiz. The model as released, with a threshold, reaches about the same point on human questions as the best fine-tuned run (11% / 49% against 11% / 46%), without any training. Calibrating this needs human questions, which is the same conclusion every step of this project reached.
 
+## Step 10: answers that show their text
+
+The fine-tuned models answered in a few words ("the court [1]") because the training answers were short. Here each training target is the short answer followed by the sentence of the cited article it rests on, picked automatically (most words shared with the answer and question) and copied word for word: «…، إذ ينص النص [1] على: «…»». Same rewrites and the same 12% "not found" share as step 4.
+
+| | Cites the gold passage | Says "not found" when the law is missing | Says "not found" although the answer is there | Answer F1 |
+|---|---|---|---|---|
+| 12%, short answers (step 4), test | **96%** | 40% | **2%** | **0.81** |
+| 12%, answer + quote, test | 92% | **68%** | 7% | 0.31 |
+| 12%, short answers (step 4), Najiz | **77%** | 46% | **11%** | 0.37 |
+| 12%, answer + quote, Najiz | 56% | **73%** | 37% | **0.47** |
+
+The answers now show their evidence: on the demo questions every quote is copied exactly from the cited article. But with the same 12% setting the model refuses far more often than the step 4 run did, on human questions 37% against 11%. The training setting is identical apart from the answer form, so this is at least partly run-to-run variation: the 11% of step 4 was probably a favourable run, not a stable property of 12%. It is the clearest sign in this project that single training runs, judged on 79 questions, cannot settle how often the model should refuse. Answer F1 falls on test because the reference answers there are short; it rises on Najiz, whose references are long.
+
 ## Demo
 
-[readaloush.github.io/sanad](https://readaloush.github.io/sanad/) shows eight plain-language questions on the 717 ALARB statute articles, answered by ALLaM before fine-tuning and by the 12% and 18% models, with the three retrieved articles and a note on what happened. Two of the questions ask about law that is not in the collection. On the six that are, the retriever brought the article that holds the answer for only three, which is the honest picture of where the system stands.
+[readaloush.github.io/sanad](https://readaloush.github.io/sanad/) shows eight plain-language questions on the 717 ALARB statute articles, answered by ALLaM before fine-tuning, the short-answer model (step 4) and the answer + quote model (step 10), with the three articles found by BM25 + bge-m3 + reranker and a note on what happened. A search box finds the closest of the 717 articles to any question, in the browser. Two of the questions ask about law that is not in the collection. On the six that are, this search brings the article that holds the answer for five (e5 alone: three).
