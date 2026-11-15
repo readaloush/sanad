@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sanad: grounded question answering over Saudi law in Arabic</title>
+<style>
+@page{size:A4}
+:root{--ink:#1B2A2F;--muted:#55666B;--rule:#C9D1CE;--seal:#1E6B52}
+html{color:var(--ink);font:10.4pt/1.55 "Source Serif 4","Noto Serif","DejaVu Serif",Georgia,serif}
+body{margin:0}
+h1{font:600 21pt/1.2 "Readex Pro","Noto Sans","DejaVu Sans",sans-serif;margin:0 0 6pt;letter-spacing:-.01em}
+h1 .ar{font-family:"Noto Naskh Arabic",serif;color:var(--seal);margin-left:.3em}
+.sub{font:400 11.5pt/1.4 "Readex Pro","Noto Sans",sans-serif;color:var(--muted);margin:0 0 4pt}
+.meta{font:400 9pt/1.5 "Readex Pro","Noto Sans",sans-serif;color:var(--muted);margin:0 0 18pt}
+h2{font:600 12.5pt/1.3 "Readex Pro","Noto Sans",sans-serif;margin:20pt 0 6pt;break-after:avoid}
+h3{font:600 10.5pt/1.3 "Readex Pro","Noto Sans",sans-serif;margin:12pt 0 4pt;break-after:avoid}
+p{margin:0 0 7pt;text-align:justify;hyphens:auto}
+.abstract{border-left:2pt solid var(--seal);padding:2pt 0 2pt 12pt;margin:0 0 14pt}
+.abstract p{margin:0}
+table{border-collapse:collapse;width:100%;margin:6pt 0 4pt;font:8.8pt/1.35 "Readex Pro","Noto Sans",sans-serif;break-inside:avoid}
+th,td{padding:3.5pt 6pt;border-bottom:.6pt solid var(--rule);text-align:left;vertical-align:top}
+th{font-weight:500;color:var(--muted);border-bottom:1pt solid var(--ink)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.cap{font:400 8.6pt/1.4 "Readex Pro","Noto Sans",sans-serif;color:var(--muted);margin:0 0 12pt}
+.cap b{color:var(--ink);font-weight:600}
+.ar{font-family:"Noto Naskh Arabic","DejaVu Sans",serif;direction:rtl;unicode-bidi:isolate}
+code{font:8.8pt "DejaVu Sans Mono",monospace}
+ol.refs{font-size:9pt;padding-left:16pt}
+ol.refs li{margin-bottom:3pt}
+ul{margin:0 0 7pt;padding-left:15pt}
+li{margin-bottom:2pt}
+b.best{font-weight:600}
+</style>
+</head>
+<body>
+
+<h1>Sanad<span class="ar">سند</span></h1>
+<p class="sub">Grounded question answering over Saudi law in Arabic, and what LLM-written benchmarks hide</p>
+<p class="meta">Read Aloush · November 2026 · github.com/readaloush/sanad</p>
+
+<div class="abstract"><p><b>Abstract.</b> Sanad answers questions about Saudi law in Arabic from the text of the statutes: it retrieves the relevant articles, answers from them with a numbered citation, and says so when the answer is not in what it was given. I compare lexical, dense, hybrid and reranked retrieval on a 5,929-passage corpus, fine-tune the retriever, and fine-tune ALLaM-7B-Instruct with QLoRA to cite and to abstain. Two test sets are used: 1,661 questions an LLM wrote while reading the passage (ArabLegalEval) and 79 questions people asked (Najiz QA). The main finding is that the two disagree. On LLM-written questions, word matching beats every embedding model and fine-tuning raises Recall@1 from 74.2% to 82.1%; on human questions the same fine-tuning lowers Recall@5 from 86.1% to 70.9%, and the fine-tuned answering model says "not found" for 44% of questions whose answer it was given. Rewriting the training questions in plain language and lowering the share of abstention examples cuts false "not found" to 11% and raises correct citation from 55% to 77% on human questions, at the cost of answering more often when the law is missing. A third run shows that the wording was not the cause: with 18% abstention examples instead of 12%, the model is back to refusing 44% of answerable human questions. Scoring the likelihood of "not found" and thresholding it gives a tunable trade-off, but thresholds chosen on LLM-written questions do not transfer, and the separation fine-tuning adds on them (AUC 0.81 → 0.95) almost vanishes on human questions (0.78 → 0.81). Every improvement measured on LLM-written questions in this project either failed to carry over to human questions or reversed.</p></div>
+
+<h2>1. Problem</h2>
+<p>Someone with a question about Saudi law usually asks it the way they would ask a friend: <span class="ar">إذا لم أتفق مع المحامي على أتعابه، فمن يحدد المبلغ؟</span> ("If I didn't agree a fee with my lawyer, who sets the amount?"). The answer sits in one article of one statute, written in formal legal Arabic. A general chatbot will answer anyway, without saying where the answer comes from, and will answer just as confidently when it does not know. For legal questions both failures matter more than fluency.</p>
+<p>Sanad is a retrieval-augmented system built around two requirements: every answer names the article it rests on, and when the retrieved articles do not contain the answer, the system says <span class="ar">«لا أجد الإجابة في النصوص المتاحة»</span> ("I can't find the answer in the available texts") instead of guessing. The project measures how well each part meets these requirements, on questions written by a model and on questions written by people.</p>
+
+<h2>2. Data</h2>
+<ul>
+<li><b>ArabLegalEval</b> [1]: 10,583 multiple-choice questions generated by GPT-4 and Claude 3 Opus from 5,725 passages of Saudi law. The repository states no licence, so it is used for evaluation and for training experiments whose outputs are not redistributed.</li>
+<li><b>Najiz QA</b>, from the same repository: 79 expert-verified questions taken from public FAQs of the Saudi Ministry of Justice portal, each with the legal text that answers it. These are the only human-written questions available.</li>
+<li><b>ALARB</b> [2] (Apache-2.0): about 13,000 Saudi commercial court cases with the statute articles each case cites. Its 717 distinct articles carry the law's name and the article number; they are added to the corpus and form the collection the public service and demo use.</li>
+</ul>
+<p>After normalising and deduplicating, the corpus has 5,929 passages. Questions are split 70/15/15 by the passage they were written from (by a hash of the passage id), so a passage never answers both a training and a test question. The passages behind the Najiz questions are forced into the test split, and any training pair that touches a held-out passage is dropped (4,816 of 10,608 ALARB fact-to-article pairs). The resulting sets are 7,325 training, 1,597 development and 1,661 test questions.</p>
+<p>The ArabLegalEval questions were written by a model looking at the passage, so they reuse its words. This is the central caveat of the whole study, and it is why Najiz is reported next to every result even though 79 questions is small: one question is 1.3 percentage points.</p>
+
+<h2>3. Retrieval baselines</h2>
+<p>Arabic text is normalised (diacritics and tatweel removed, alef forms unified, <span class="ar">ى</span>→<span class="ar">ي</span>, <span class="ar">ة</span>→<span class="ar">ه</span>, Arabic-Indic digits converted) and, for BM25, lightly stemmed by stripping article and conjunction prefixes such as <span class="ar">وال، بال، لل</span>. Dense retrievers use their documented prefixes (<code>query:</code> / <code>passage:</code> for e5). Hybrid retrieval fuses BM25 and bge-m3 rankings with reciprocal rank fusion [3]; the reranker is bge-reranker-v2-m3 over the fused top 20.</p>
+<table>
+<thead><tr><th>Retriever</th><th class="n">Test R@1</th><th class="n">R@10</th><th class="n">MRR@10</th><th class="n">Najiz R@1</th><th class="n">R@10</th><th class="n">MRR@10</th><th class="n">ms/query</th></tr></thead>
+<tbody>
+<tr><td>BM25, normalised and stemmed</td><td class="n">79.0</td><td class="n">94.6</td><td class="n">.847</td><td class="n">40.5</td><td class="n">70.9</td><td class="n">.497</td><td class="n">10.0</td></tr>
+<tr><td>multilingual-e5-base [4]</td><td class="n">74.2</td><td class="n">94.3</td><td class="n">.815</td><td class="n">63.3</td><td class="n">87.3</td><td class="n">.715</td><td class="n">0.5</td></tr>
+<tr><td>multilingual-e5-large</td><td class="n">76.1</td><td class="n">95.5</td><td class="n">.830</td><td class="n">65.8</td><td class="n">91.1</td><td class="n">.741</td><td class="n">1.3</td></tr>
+<tr><td>bge-m3 [5]</td><td class="n">76.5</td><td class="n">95.4</td><td class="n">.836</td><td class="n">65.8</td><td class="n">89.9</td><td class="n">.745</td><td class="n">1.3</td></tr>
+<tr><td>BM25 + bge-m3 (RRF)</td><td class="n">83.1</td><td class="n">97.2</td><td class="n">.883</td><td class="n">63.3</td><td class="n">79.7</td><td class="n">.681</td><td class="n"></td></tr>
+<tr><td>the same + bge-reranker-v2-m3</td><td class="n"><b class="best">85.9</b></td><td class="n"><b class="best">98.4</b></td><td class="n"><b class="best">.909</b></td><td class="n">64.6</td><td class="n"><b class="best">93.7</b></td><td class="n">.740</td><td class="n"></td></tr>
+</tbody></table>
+<p class="cap"><b>Table 1.</b> Retrieval over 5,929 passages. Test: 1,661 LLM-written questions; Najiz: 79 human-written questions. Timings per query on a Kaggle T4 with the corpus already encoded.</p>
+<p>On LLM-written questions BM25 beats every embedding model at Recall@1. On human questions it falls to 40.5% while the embedding models reach 63–66%, and fusing BM25 in costs 8–10 points of Recall@10, which the reranker wins back. The differences between embedding models on Najiz are one or two questions and not meaningful. multilingual-e5-base was kept for the rest of the work: on human questions it is within two questions of the larger models at a third of the parameters and less than half the latency.</p>
+
+<h2>4. Fine-tuning the retriever</h2>
+<p>e5-base was fine-tuned for two epochs with in-batch negatives (cached multiple-negatives ranking loss, no duplicate passages within a batch) and one mined hard negative per pair, selected by development-set MRR.</p>
+<table>
+<thead><tr><th>Training data</th><th class="n">Test R@1 / R@5 / R@10 / MRR</th><th class="n">Najiz R@1 / R@5 / R@10 / MRR</th></tr></thead>
+<tbody>
+<tr><td>none (starting model)</td><td class="n">74.2 / 91.0 / 94.3 / .815</td><td class="n"><b class="best">63.3 / 86.1 / 87.3 / .715</b></td></tr>
+<tr><td>ArabLegalEval training questions (7,325)</td><td class="n"><b class="best">82.1 / 95.1 / 97.4 / .876</b></td><td class="n">58.2 / 70.9 / 81.0 / .648</td></tr>
+<tr><td>the same + ALARB case facts → cited article</td><td class="n">80.5 / 94.1 / 96.9 / .865</td><td class="n">59.5 / 67.1 / 78.5 / .635</td></tr>
+<tr><td>2,400 questions, original wording</td><td class="n">76.1 / 91.0 / 94.6 / .826</td><td class="n">54.4 / 72.2 / 78.5 / .622</td></tr>
+<tr><td>the same 2,400, rewritten in plain language</td><td class="n">73.8 / 89.5 / 92.9 / .806</td><td class="n">55.7 / 73.4 / 77.2 / .628</td></tr>
+<tr><td>both wordings (4,796 pairs)</td><td class="n">77.3 / 93.0 / 96.0 / .840</td><td class="n">59.5 / 73.4 / 81.0 / .660</td></tr>
+</tbody></table>
+<p class="cap"><b>Table 2.</b> Retriever fine-tuning, dense retrieval only. Every fine-tuned model loses at least 12 points of Recall@5 on human questions.</p>
+<p>Fine-tuning gains eight points of Recall@1 on questions like the training ones and loses on the questions people asked: Recall@5 falls from 86.1% to 70.9%, twelve of 79 questions. Model selection by development MRR picks the fine-tuned model, because the development set is LLM-written too; a pipeline that only looked at its own benchmark would ship the worse retriever. Rewriting the training questions in plain language (Section 6) does not fix this. The rewrites are still produced by a model, and the question–passage pairs they encode are still the ones a model chose, so the retriever learns the benchmark rather than the people. The deployed system uses the starting e5-base model with dense retrieval only.</p>
+
+<h2>5. The answering model</h2>
+<p>Two openly licensed 7B instruction models were compared, both loaded in 4-bit NF4 on a single T4: ALLaM-7B-Instruct [6], trained by SDAIA with a large Arabic share, and Qwen2.5-7B-Instruct [7]. Each sees the top three retrieved passages, numbered, under a system prompt that asks for a one- or two-sentence answer with the passage number in brackets, and for the fixed "not found" sentence otherwise.</p>
+<h3>Multiple choice</h3>
+<p>Accuracy is read from the next-token probabilities of the letters A–D, with no context (closed book), with the top three retrieved passages, and with the gold passage alone.</p>
+<table>
+<thead><tr><th>Model</th><th class="n">Closed book</th><th class="n">Retrieved top 3</th><th class="n">Gold passage</th></tr></thead>
+<tbody>
+<tr><td>ALLaM-7B-Instruct</td><td class="n">67.3</td><td class="n">93.5</td><td class="n">97.8</td></tr>
+<tr><td>Qwen2.5-7B-Instruct</td><td class="n">65.8</td><td class="n">93.5</td><td class="n">97.8</td></tr>
+<tr><td>ALLaM + QLoRA, 25% abstention examples</td><td class="n">67.0</td><td class="n"><b class="best">96.5</b></td><td class="n">98.8</td></tr>
+<tr><td>ALLaM + QLoRA, plain-language rewrites, 12%</td><td class="n">68.8</td><td class="n">95.0</td><td class="n"><b class="best">99.0</b></td></tr>
+</tbody></table>
+<p class="cap"><b>Table 3.</b> Multiple-choice accuracy (%) on 400 test questions. The gold passage is among the top three retrieved for 87% of them.</p>
+<p>Retrieval is worth 26 points. Fine-tuning does not add legal knowledge (closed book is unchanged) but makes better use of the passages provided. On the development set ALLaM led Qwen with retrieved passages (94.0% against 92.0%), so ALLaM was chosen for fine-tuning.</p>
+<h3>Grounded answers</h3>
+<p>For free-form answers four things are measured on 150 test questions and the 79 Najiz questions: whether the answer cites the gold passage; whether the model wrongly says "not found" although the gold passage is in its context; whether it says "not found" when the gold passage has been removed from the context (the same question, now unanswerable from what it sees); and token F1 against the reference answer, with citations stripped.</p>
+<p>QLoRA trains rank-16 adapters on every linear layer of the 4-bit model, 1,600 examples, one epoch, learning rate 2·10<sup>−4</sup>, effective batch 8. Each example is a training question with its top three retrieved passages. With probability <i>p</i> the gold passage is removed and the target is the "not found" sentence; otherwise the gold passage is put in the context if the retriever missed it, and the target is the short reference answer followed by its passage number. No development, test or Najiz question or passage is used.</p>
+<table>
+<thead><tr><th>Model</th><th>Set</th><th class="n">Cites gold</th><th class="n">"Not found" when law is missing</th><th class="n">False "not found"</th><th class="n">Answer F1</th></tr></thead>
+<tbody>
+<tr><td>ALLaM-7B-Instruct</td><td>test</td><td class="n">27%</td><td class="n">16%</td><td class="n">0%</td><td class="n">0.42</td></tr>
+<tr><td>Qwen2.5-7B-Instruct</td><td>test</td><td class="n">90%</td><td class="n">46%</td><td class="n">1%</td><td class="n">0.44</td></tr>
+<tr><td>ALLaM + QLoRA, <i>p</i> = 0.25</td><td>test</td><td class="n">93%</td><td class="n"><b class="best">84%</b></td><td class="n">7%</td><td class="n">0.80</td></tr>
+<tr><td>ALLaM-7B-Instruct</td><td>Najiz</td><td class="n">26%</td><td class="n">18%</td><td class="n">2%</td><td class="n">0.46</td></tr>
+<tr><td>Qwen2.5-7B-Instruct</td><td>Najiz</td><td class="n">76%</td><td class="n">33%</td><td class="n">3%</td><td class="n">0.43</td></tr>
+<tr><td>ALLaM + QLoRA, <i>p</i> = 0.25</td><td>Najiz</td><td class="n">55%</td><td class="n"><b class="best">86%</b></td><td class="n">44%</td><td class="n">0.47</td></tr>
+</tbody></table>
+<p class="cap"><b>Table 4.</b> Grounded answers on 150 test questions (135 with the gold passage in the top 3) and the 79 Najiz questions (62 with it in the top 3). The unanswerable versions use all questions.</p>
+<p>Before fine-tuning, ALLaM answered 84% of test questions whose law it had not been given and cited the right passage only 27% of the time; Qwen cited much better (90%) but still answered most unanswerable questions. Fine-tuning with <i>p</i> = 0.25 fixes both on LLM-written questions: 93% correct citations, 84% correct abstention, F1 from 0.42 to 0.80.</p>
+<p>On human questions it overcorrects. It says "not found" for 44% of the Najiz questions whose answer is in front of it. One explanation, tested in Section 6, is the same as in Section 4: in training, the answerable examples were LLM-written questions that share words with their passage, so the model learned that a missing word overlap means a missing answer, and people do not use the words of the law.</p>
+
+<h2>6. Training on how people ask</h2>
+<p>To test that explanation, Qwen2.5-7B-Instruct rewrote 2,400 training questions in the style of a non-lawyer, seeing only the question and never the passage; 2,396 rewrites were usable. They are moderate paraphrases, with some drift in meaning. ALLaM was then fine-tuned on the rewritten questions. Because this step changes two things at once (the wording and the share of abstention examples), a third run used the same rewrites with 18% abstention examples, between the two.</p>
+<p>The rewritten training cut false "not found" on human questions from 44% to 11% and raised correct citations from 55% to 77%. The price is the opposite failure: with the relevant article removed, the model now answers more than half the time, usually from a neighbouring article. The share of abstention examples looks like a dial between refusing too often and answering too readily. </p>
+<table>
+<thead><tr><th>Abstention examples, training questions</th><th>Set</th><th class="n">Cites gold</th><th class="n">"Not found" when law is missing</th><th class="n">False "not found"</th><th class="n">Answer F1</th></tr></thead>
+<tbody>
+<tr><td>25%, original wording</td><td>Najiz</td><td class="n">55%</td><td class="n">86%</td><td class="n">44%</td><td class="n">0.47</td></tr>
+<tr><td>12%, plain-language rewrites</td><td>Najiz</td><td class="n"><b class="best">77%</b></td><td class="n">46%</td><td class="n"><b class="best">11%</b></td><td class="n">0.37</td></tr>
+<tr><td>18%, plain-language rewrites</td><td>Najiz</td><td class="n">56%</td><td class="n">86%</td><td class="n">44%</td><td class="n">0.44</td></tr>
+<tr><td>25%, original wording</td><td>test</td><td class="n">93%</td><td class="n">84%</td><td class="n">7%</td><td class="n">0.80</td></tr>
+<tr><td>12%, plain-language rewrites</td><td>test</td><td class="n">96%</td><td class="n">40%</td><td class="n">2%</td><td class="n">0.81</td></tr>
+<tr><td>18%, plain-language rewrites</td><td>test</td><td class="n">90%</td><td class="n">65%</td><td class="n">5%</td><td class="n">0.82</td></tr>
+</tbody></table>
+<p class="cap"><b>Table 5.</b> The abstention share in training. On human questions the 18% run is indistinguishable from the 25% run without rewrites.</p>
+<p>The 18% run lands exactly where the 25% run did on human questions, so the plain-language wording was not what reduced false refusals; the lower share of abstention examples was. The behaviour also does not move smoothly with the share: on Najiz it flips between 12% and 18%. With one run per setting some of that jump may be noise between training runs, but either way retraining is an unreliable way to choose it.</p>
+<h3>A threshold instead of a training ratio</h3>
+<p>The alternative is to leave the trained model alone and decide afterwards. For each question I score the mean log-probability of the "not found" sentence, teacher-forced after the prompt, and say "not found" when it exceeds a threshold. If the score separates answerable from unanswerable questions, any point on the trade-off can be chosen without retraining.</p>
+<table>
+<thead><tr><th>Model</th><th class="n">AUC dev</th><th class="n">AUC test</th><th class="n">AUC Najiz</th><th class="n">Test at 2% dev target</th><th class="n">Najiz at 2% dev target</th></tr></thead>
+<tbody>
+<tr><td>ALLaM, as released</td><td class="n">0.78</td><td class="n">0.81</td><td class="n">0.78</td><td class="n">0.7% / 22%</td><td class="n">6.5% / 30%</td></tr>
+<tr><td>QLoRA, 25%, original wording</td><td class="n"><b class="best">0.93</b></td><td class="n"><b class="best">0.95</b></td><td class="n">0.81</td><td class="n">2.2% / 77%</td><td class="n">32.3% / 75%</td></tr>
+<tr><td>QLoRA, 12%, rewrites</td><td class="n">0.89</td><td class="n">0.89</td><td class="n">0.79</td><td class="n">5.2% / 59%</td><td class="n">32.3% / 71%</td></tr>
+<tr><td>QLoRA, 18%, rewrites</td><td class="n">0.89</td><td class="n">0.89</td><td class="n">0.81</td><td class="n">5.2% / 65%</td><td class="n">50.0% / 90%</td></tr>
+</tbody></table>
+<p class="cap"><b>Table 6.</b> AUC: probability that an unanswerable question scores above an answerable one. Right columns: false "not found" / "not found" when the law is missing, with the threshold chosen on 150 development questions for 2% false "not found".</p>
+<p>Fine-tuning makes the model much better at telling when the answer is missing on questions like its training data, and barely better on questions people asked: 0.78 to 0.81, within the noise of 62 answerable and 79 unanswerable questions. A threshold chosen on LLM-written questions does not carry over: 2% false "not found" on test becomes 32% on Najiz, because every human question looks less answerable to the model. The released model with a threshold at a 10% development target reaches 11% false "not found" and 49% correct "not found" on Najiz, about the same as the best fine-tuned run (11% and 46%), with no training. Calibrating the threshold needs a few hundred real questions.</p>
+<p>One measurement caveat applies to every "says not found when the law is missing" figure. ArabLegalEval passages overlap (518 of them also appear among the ALARB articles, and many laws repeat provisions), so when the gold passage is removed, a neighbouring passage sometimes still contains the answer. Some answers counted as failures to abstain are therefore correct. The figure is a lower bound on the model's real abstention quality, not an exact rate.</p>
+
+<h2>7. Serving</h2>
+<p>The service has no PyTorch dependency. The retriever is exported to ONNX with L2 normalisation built in (1.1 GB in float32) and runs with ONNX Runtime and the <code>tokenizers</code> library; an int8 version is 278 MB, with the cost shown below. The 717 ALARB articles are embedded in advance and stored in float16. The language model is reached through any OpenAI-compatible endpoint (vLLM, llama.cpp or Ollama), so it can be swapped without changing the service. A FastAPI app exposes <code>/search</code> and <code>/ask</code>; <code>/ask</code> returns the answer, whether it is a "not found", each source with its law name, article number and score, which sources were cited, and any citation number that does not refer to a provided source. A Docker image and tests with a tiny ONNX model and a fake LLM are included.</p>
+<table>
+<thead><tr><th>Retriever on CPU</th><th class="n">Test R@1 / R@5 / R@10</th><th class="n">Najiz R@1 / R@5 / R@10</th><th class="n">ms / passage</th></tr></thead>
+<tbody>
+<tr><td>PyTorch float32, 512 tokens</td><td class="n">74.5 / 91.1 / 94.6</td><td class="n">63.3 / 86.1 / 87.3</td><td class="n">181</td></tr>
+<tr><td>PyTorch float32, 256 tokens</td><td class="n">74.7 / 91.0 / 94.5</td><td class="n">63.3 / 87.3 / 88.6</td><td class="n">166</td></tr>
+<tr><td>ONNX, default dynamic int8 (all ops, per tensor)</td><td class="n">69.2 / 87.5 / 92.2</td><td class="n">50.6 / 73.4 / 81.0</td><td class="n">354</td></tr>
+</tbody></table>
+<p class="cap"><b>Table 7.</b> The cost of serving choices, measured on the full corpus on a Kaggle CPU.</p>
+<p>Truncating inputs to 256 tokens costs nothing. Default dynamic int8 quantisation, which looked harmless by cosine similarity to the original embeddings (minimum 0.94 on 64 passages), costs 13 points of Recall@1 on human questions and was also slower on this CPU. The service therefore uses the float32 model; quantising only the matrix multiplications with per-channel scales is being measured. A cosine check is not a retrieval check.</p>
+
+<h2>8. Limitations</h2>
+<ul>
+<li><b>The human test set is small and no longer untouched.</b> Najiz has 79 questions; differences of one or two questions are noise. Its results also motivated Section 6, so it served partly as a development set from that point on. There is no other public human-written test set for Saudi law that I know of.</li>
+<li><b>One run per configuration.</b> No seeds were repeated, so no confidence intervals are given.</li>
+<li><b>Token F1 understates human-question quality.</b> Najiz reference answers are whole paragraphs; a correct one-sentence answer scores low.</li>
+<li><b>Coverage.</b> The served collection is 717 articles, mostly civil procedure, companies, commercial courts, evidence, bankruptcy and the legal profession. Labour, traffic and personal-status law are largely absent. The system is a study, not legal advice.</li>
+<li><b>Licences.</b> ArabLegalEval has no stated licence; its passages are not redistributed, and the public index uses ALARB only.</li>
+</ul>
+
+<h2>9. Related work</h2>
+<p>ArabLegalEval [1] introduced the benchmark used here and evaluated LLMs on it, largely on multiple-choice and LLM-written questions. Several open projects apply retrieval-augmented generation to Saudi labour law, and commercial Saudi legal assistants exist. The contribution of this project is not the idea of a Saudi legal RAG system but the measurement: separating LLM-written from human-written questions at every stage, showing that the usual training and model-selection signals point the wrong way on the latter, and treating abstention as a measured, tunable behaviour rather than a prompt instruction.</p>
+
+<h2>10. Conclusion</h2>
+<p>A 7B Arabic model with a small dense retriever can answer questions about the Saudi statutes it is given with a correct citation most of the time, and fine-tuning on 1,600 examples is enough to teach it to cite and to refuse. The more useful lesson is about evaluation. Benchmarks written by a model from the source text reward word matching, and every improvement measured on them in this project (fine-tuned retrievers, hybrid retrieval, cheaper quantisation, abstention thresholds) either did not carry over to the questions people ask or made the system worse for them. A few dozen real questions changed every decision that mattered. The single most valuable next step is not a larger model but a few hundred real questions, to choose the retriever, the abstention threshold and the training data against.</p>
+
+<h2>References</h2>
+<ol class="refs">
+<li>F. Hijazi et al. ArabLegalEval: a multitask benchmark for assessing Arabic legal knowledge in large language models. 2024. github.com/Thiqah/ArabLegalEval</li>
+<li>ALARB: Saudi commercial court cases with the statute articles they cite (THIQAH), Apache-2.0. huggingface.co/datasets/HarethahMo/ALARB</li>
+<li>G. V. Cormack, C. L. A. Clarke, S. Büttcher. Reciprocal rank fusion outperforms Condorcet and individual rank learning methods. SIGIR 2009.</li>
+<li>L. Wang et al. Multilingual E5 text embeddings: a technical report. 2024.</li>
+<li>J. Chen et al. BGE M3-Embedding: multi-lingual, multi-functionality, multi-granularity text embeddings through self-knowledge distillation. 2024.</li>
+<li>M. S. Bari et al. ALLaM: large language models for Arabic and English. 2024.</li>
+<li>Qwen Team. Qwen2.5 technical report. 2024.</li>
+<li>T. Dettmers et al. QLoRA: efficient finetuning of quantized LLMs. NeurIPS 2023.</li>
+<li>S. Robertson, H. Zaragoza. The probabilistic relevance framework: BM25 and beyond. 2009.</li>
+</ol>
+
+</body>
+</html>
