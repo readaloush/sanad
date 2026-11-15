@@ -33,7 +33,7 @@ def artifacts(tmp_path_factory):
     tok.pre_tokenizer = pre_tokenizers.Whitespace()
     tok.save(str(d / "tokenizer.json"))
     ids = torch.tensor([[5, 6, 0]])
-    torch.onnx.export(Tiny(), (ids, (ids > 0).long()), str(d / "text.int8.onnx"), dynamo=False,
+    torch.onnx.export(Tiny(), (ids, (ids > 0).long()), str(d / "text.onnx"), dynamo=False,
                       input_names=["input_ids", "attention_mask"], output_names=["embedding"],
                       dynamic_axes={"input_ids": {0: "b", 1: "t"}, "attention_mask": {0: "b", 1: "t"}, "embedding": {0: "b"}})
     np.save(d / "corpus.npy", np.eye(3, dtype=np.float16))
@@ -45,14 +45,14 @@ def artifacts(tmp_path_factory):
 
 
 def test_search_finds_the_right_article(artifacts):
-    enc = TextEncoder(artifacts / "text.int8.onnx", artifacts / "tokenizer.json")
+    enc = TextEncoder(artifacts / "text.onnx", artifacts / "tokenizer.json")
     corpus = Corpus.load(artifacts)
     assert corpus.search(enc(["query : إجازة عامل"])[0], 1)[0]["article"] == "109"
     assert corpus.search(enc(["query : دعوى"])[0], 1)[0]["id"] == "c"
 
 
 def test_ask_keeps_only_citations_to_passages_it_was_shown(artifacts):
-    enc = TextEncoder(artifacts / "text.int8.onnx", artifacts / "tokenizer.json")
+    enc = TextEncoder(artifacts / "text.onnx", artifacts / "tokenizer.json")
     corpus = Corpus.load(artifacts)
     seen = {}
 
@@ -67,7 +67,7 @@ def test_ask_keeps_only_citations_to_passages_it_was_shown(artifacts):
 
 
 def test_ask_reports_not_found(artifacts):
-    enc = TextEncoder(artifacts / "text.int8.onnx", artifacts / "tokenizer.json")
+    enc = TextEncoder(artifacts / "text.onnx", artifacts / "tokenizer.json")
     r = ask("شركة", enc, Corpus.load(artifacts), lambda m: ABSTAIN)
     assert r["not_found"] and not any(s["cited"] for s in r["sources"])
 
