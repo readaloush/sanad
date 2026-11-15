@@ -31,15 +31,15 @@
    ],
    "not_found": false
   },
-  "lora3": {
-   "answer": "المحكمة [1]",
+  "note": "The search found the article that answers this (Lawyers Law, article 26). All three answer that the court decides. The released model does not say which text it used; the short model cites [1]; the quoting model also copies the sentence of article 26 it rests on.",
+  "retrieved_answering_article": true,
+  "lora4": {
+   "answer": "المحكمة التي نظرت في القضية، إذ ينص النص [1] على: «تحدد أتعاب المحامي وطريقة دفعها باتفاق يعقده مع موكله، فإذا لم يكن هناك اتفاق أو كان الاتفاق مختلفا فيه أو باطلا، قدرتها المحكمة التي نظرت في القضية عند اختلافهما بناء على طلب المحامي أو الموكل بما يتناسب مع الجهد الذي بذله المحامي والنفع…»",
    "cited": [
     1
    ],
    "not_found": false
-  },
-  "note": "The search found the article that answers this (Lawyers Law, article 26). All three answer that the court decides. The released model does not say which text it used; both fine-tuned models cite [1].",
-  "retrieved_answering_article": true
+  }
  },
  {
   "question": "توفي المحامي قبل أن تنتهي قضيتي، فكيف تُحسب أتعابه لورثته؟",
@@ -75,13 +75,13 @@
    ],
    "not_found": false
   },
-  "lora3": {
+  "note": "Right article found (article 28). The released model and the short model answer from it and cite [1]. The quoting model says “not found” although the answer is in [1]: it refuses more often than the short model (see the numbers below).",
+  "retrieved_answering_article": true,
+  "lora4": {
    "answer": "لا أجد الإجابة في النصوص المتاحة.",
    "cited": [],
    "not_found": true
-  },
-  "note": "Right article found (article 28). The released model and the 12% model both answer from it and cite [1]. The 18% model says “not found” although the answer is in [1]: the over-refusal the numbers show.",
-  "retrieved_answering_article": true
+  }
  },
  {
   "question": "كنت أعمل محاميًا لدى شركة ثم تركتها، فمتى يحق لي أن أترافع ضدها؟",
@@ -115,15 +115,15 @@
    ],
    "not_found": false
   },
-  "lora3": {
-   "answer": "بعد مضي مدة لا تقل عن خمس سنوات من تاريخ انتهاء العلاقة مع الشركة [1]",
+  "note": "The search brings the Lawyers Law article that answers this (article 14). All three give the right answer, five years. The released model says it comes from article 1, which is wrong; the quoting model shows the exact sentence of article 14. With the simpler search this article was missed and the fine-tuned models said “not found”.",
+  "retrieved_answering_article": true,
+  "lora4": {
+   "answer": "بعد مضي مدة لا تقل عن خمس سنوات من تاريخ انتهاء العلاقة بها، إذ ينص النص [1] على: «١- لا يجوز للمحامي بنفسه أو بوساطة محام آخر أن يقبل أي دعوى أو يعطي أي استشارة ضد جهة يعمل لديها، أو ضد جهة انتهت علاقته بها، إلا بعد مضي مدة لا تقل عن خمس سنوات من تاريخ انتهاء علاقته بها.»",
    "cited": [
     1
    ],
    "not_found": false
-  },
-  "note": "The better search now brings the Lawyers Law article that answers this (article 14). All three give the right answer, five years; the fine-tuned models cite [1]. With the old search this article was missed and the fine-tuned models said “not found”.",
-  "retrieved_answering_article": true
+  }
  },
  {
   "question": "ما أنواع الشركات التي يمكن تأسيسها في السعودية؟",
@@ -157,13 +157,13 @@
    ],
    "not_found": false
   },
-  "lora3": {
+  "note": "The article that lists the kinds of company is not among the three found; [1] is about the articles of association. The released model listed company types from general knowledge. The short model misread [1] and gave a wrong answer with a citation; the quoting model said “not found”, which is right for what it was given.",
+  "retrieved_answering_article": false,
+  "lora4": {
    "answer": "لا أجد الإجابة في النصوص المتاحة.",
    "cited": [],
    "not_found": true
-  },
-  "note": "The article that lists the kinds of company is still not among the three found; [1] is about the articles of association. The released model listed company types from general knowledge. The 12% model misread [1] and gave a wrong answer with a citation; the 18% model said “not found”, which is right for what it was given.",
-  "retrieved_answering_article": false
+  }
  },
  {
   "question": "هل يحق لي بصفتي مساهمًا أن أطلع على حسابات الشركة؟",
@@ -197,15 +197,15 @@
    ],
    "not_found": false
   },
-  "lora3": {
-   "answer": "نعم [1]",
+  "note": "The search finds the right article: [1] (Companies Law, article 21) gives partners and shareholders the right to oversee the company’s accounts. All three say yes; the quoting model shows the sentence of article 21.",
+  "retrieved_answering_article": true,
+  "lora4": {
+   "answer": "نعم، إذ ينص النص [1] على: «للشركاء والمساهمين حق الرقابة على حسابات الشركة وفقًا للأحكام المنصوص عليها في النظام وعقد تأسيس الشركة أو نظامها الأساس.»",
    "cited": [
     1
    ],
    "not_found": false
-  },
-  "note": "The search now finds the right article: [1] (Companies Law, article 21) gives partners and shareholders the right to oversee the company’s accounts. All three say yes; the fine-tuned models cite [1], very briefly.",
-  "retrieved_answering_article": true
+  }
  },
  {
   "question": "من يستطيع أن يطلب من المحكمة تصفية شركة عاجزة عن سداد ديونها؟",
@@ -241,15 +241,13 @@
    ],
    "not_found": false
   },
-  "lora3": {
-   "answer": "المصفي [1]",
-   "cited": [
-    1
-   ],
-   "not_found": false
-  },
-  "note": "Article [1] (Companies Law, article 254) says the liquidator must apply to the court when the company’s assets cannot cover its debts. All three answer “the liquidator” and cite it.",
-  "retrieved_answering_article": true
+  "note": "Article [1] (Companies Law, article 254) says the liquidator must apply to the court when the company’s assets cannot cover its debts. The released model and the short model answer “the liquidator” and cite it. The quoting model says “not found” although the answer is in [1].",
+  "retrieved_answering_article": true,
+  "lora4": {
+   "answer": "لا أجد الإجابة في النصوص المتاحة.",
+   "cited": [],
+   "not_found": true
+  }
  },
  {
   "question": "كم مدة إجازة الأمومة للموظفة في القطاع الخاص؟",
@@ -281,13 +279,13 @@
    "cited": [],
    "not_found": true
   },
-  "lora3": {
+  "note": "Labour law is not in the collection. All three said the answer is not there. With the simpler search, the released model made up a length of maternity leave.",
+  "retrieved_answering_article": null,
+  "lora4": {
    "answer": "لا أجد الإجابة في النصوص المتاحة.",
    "cited": [],
    "not_found": true
-  },
-  "note": "Labour law is not in the collection. All three said the answer is not there. With the old search, the released model made up a length of maternity leave.",
-  "retrieved_answering_article": null
+  }
  },
  {
   "question": "ما غرامة قطع الإشارة الحمراء؟",
@@ -319,12 +317,12 @@
    "cited": [],
    "not_found": true
   },
-  "lora3": {
+  "note": "Traffic law is not in the collection. All three said the answer is not there.",
+  "retrieved_answering_article": null,
+  "lora4": {
    "answer": "لا أجد الإجابة في النصوص المتاحة.",
    "cited": [],
    "not_found": true
-  },
-  "note": "Traffic law is not in the collection. All three said the answer is not there.",
-  "retrieved_answering_article": null
+  }
  }
 ]
