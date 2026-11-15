@@ -4,57 +4,157 @@
 <meta charset="utf-8">
 <title>Sanad: grounded question answering over Saudi law in Arabic</title>
 <style>
-@page{size:A4}
-:root{--ink:#1B2A2F;--muted:#55666B;--rule:#C9D1CE;--seal:#1E6B52}
-html{color:var(--ink);font:10.4pt/1.55 "Source Serif 4","Noto Serif","DejaVu Serif",Georgia,serif}
+@page{size:A4;margin:20mm 19mm 20mm 19mm}
+@page :first{margin:0}
+:root{--ink:#1B2A2F;--muted:#55666B;--rule:#C9D1CE;--seal:#006C35;--deep:#003D22;--gold:#B8862F;--soft:#EEF3F0;--code:#F4F6F5}
+html{color:var(--ink);font:10.2pt/1.56 "Source Serif 4","Noto Serif",Georgia,serif}
 body{margin:0}
-h1{font:600 21pt/1.2 "Readex Pro","Noto Sans","DejaVu Sans",sans-serif;margin:0 0 6pt;letter-spacing:-.01em}
-h1 .ar{font-family:"Noto Naskh Arabic",serif;color:var(--seal);margin-left:.3em}
-.sub{font:400 11.5pt/1.4 "Readex Pro","Noto Sans",sans-serif;color:var(--muted);margin:0 0 4pt}
-.meta{font:400 9pt/1.5 "Readex Pro","Noto Sans",sans-serif;color:var(--muted);margin:0 0 18pt}
-h2{font:600 12.5pt/1.3 "Readex Pro","Noto Sans",sans-serif;margin:20pt 0 6pt;break-after:avoid}
-h3{font:600 10.5pt/1.3 "Readex Pro","Noto Sans",sans-serif;margin:12pt 0 4pt;break-after:avoid}
+h1,h2,h3,.ui{font-family:"Readex Pro","Noto Sans",sans-serif}
+h2{font-size:13pt;font-weight:600;margin:22pt 0 7pt;color:var(--deep);break-after:avoid}
+h2 .num{color:var(--gold);margin-right:6pt}
+h3{font-size:10.6pt;font-weight:600;margin:13pt 0 4pt;break-after:avoid}
 p{margin:0 0 7pt;text-align:justify;hyphens:auto}
-.abstract{border-left:2pt solid var(--seal);padding:2pt 0 2pt 12pt;margin:0 0 14pt}
-.abstract p{margin:0}
-table{border-collapse:collapse;width:100%;margin:6pt 0 4pt;font:8.8pt/1.35 "Readex Pro","Noto Sans",sans-serif;break-inside:avoid}
+ul,ol{margin:0 0 7pt;padding-left:16pt}
+li{margin-bottom:2.5pt}
+.ar{font-family:"Noto Naskh Arabic",serif;direction:rtl;unicode-bidi:isolate}
+code{font:8.6pt "DejaVu Sans Mono",monospace;background:var(--code);padding:0 2pt;border-radius:2pt}
+
+/* cover */
+.cover{height:297mm;box-sizing:border-box;display:flex;flex-direction:column;background:var(--deep);color:#fff;position:relative;overflow:hidden;break-after:page}
+.cover::before{content:"";position:absolute;inset:0;opacity:.14;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='48' viewBox='0 0 96 48'%3E%3Cg fill='none' stroke='%23C9A45C' stroke-width='2'%3E%3Cpath d='M0 24 L12 12 L24 24 L36 12 L48 24 L60 12 L72 24 L84 12 L96 24'/%3E%3Cpath d='M0 36 L12 24 L24 36 L36 24 L48 36 L60 24 L72 36 L84 24 L96 36'/%3E%3C/g%3E%3Cg fill='%23C9A45C'%3E%3Cpath d='M24 0 L30 6 L24 12 L18 6Z'/%3E%3Cpath d='M72 0 L78 6 L72 12 L66 6Z'/%3E%3C/g%3E%3C/svg%3E");background-size:96px 48px}
+.cover>*{position:relative}
+.cover .top{padding:26mm 22mm 0}
+.cover .kind{font:500 9.5pt "Readex Pro",sans-serif;color:#cfe2d7;letter-spacing:.02em;margin:0 0 14mm}
+.cover h1{font:700 44pt/1 "Reem Kufi","Readex Pro",sans-serif;margin:0;display:flex;align-items:baseline;gap:14pt}
+.cover h1 .ar{font-family:"Reem Kufi",sans-serif;color:#E9D49A}
+.cover .sub{font:400 17pt/1.35 "Readex Pro",sans-serif;margin:8mm 0 0;max-width:150mm;color:#fff;text-align:left}
+.cover .shot{margin:16mm 22mm 0;border-radius:6pt;overflow:hidden;box-shadow:0 8pt 24pt rgba(0,0,0,.35)}
+.cover .shot img{display:block;width:100%}
+.cover .meta{margin-top:auto;padding:0 22mm 22mm;display:grid;grid-template-columns:repeat(3,1fr);gap:8mm;font:400 9pt/1.5 "Readex Pro",sans-serif;color:#d5e6dc}
+.cover .meta b{display:block;font-weight:600;color:#fff;font-size:9.5pt}
+.cover .band{height:9pt;background:repeating-linear-gradient(90deg,#C9A45C 0 18px,transparent 18px 24px,#006C35 24px 42px,transparent 42px 48px)}
+
+/* front matter */
+.abstract{border-left:2.5pt solid var(--seal);padding:2pt 0 2pt 12pt;margin:0 0 12pt}
+.abstract p{margin:0 0 5pt}
+.keyfig{display:grid;grid-template-columns:repeat(4,1fr);gap:8pt;margin:4pt 0 14pt}
+.keyfig div{border-top:1.5pt solid var(--seal);padding-top:5pt;font:400 8.4pt/1.35 "Readex Pro",sans-serif;color:var(--muted)}
+.keyfig b{display:block;font:600 15pt/1.2 "Readex Pro",sans-serif;color:var(--ink)}
+.toc{font:400 9.6pt/1.9 "Readex Pro",sans-serif;columns:2;column-gap:18pt;margin:0 0 6pt;padding:0;list-style:none}
+.toc li{margin:0}
+.toc span{color:var(--gold);display:inline-block;width:18pt}
+.pb{break-before:page}
+
+/* tables, figures, code */
+table{border-collapse:collapse;width:100%;margin:6pt 0 4pt;font:8.6pt/1.35 "Readex Pro",sans-serif;break-inside:avoid}
 th,td{padding:3.5pt 6pt;border-bottom:.6pt solid var(--rule);text-align:left;vertical-align:top}
 th{font-weight:500;color:var(--muted);border-bottom:1pt solid var(--ink)}
 td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-.cap{font:400 8.6pt/1.4 "Readex Pro","Noto Sans",sans-serif;color:var(--muted);margin:0 0 12pt}
-.cap b{color:var(--ink);font-weight:600}
-.ar{font-family:"Noto Naskh Arabic","DejaVu Sans",serif;direction:rtl;unicode-bidi:isolate}
-code{font:8.8pt "DejaVu Sans Mono",monospace}
-ol.refs{font-size:9pt;padding-left:16pt}
-ol.refs li{margin-bottom:3pt}
-ul{margin:0 0 7pt;padding-left:15pt}
-li{margin-bottom:2pt}
 b.best{font-weight:600}
+.cap{font:400 8.4pt/1.4 "Readex Pro",sans-serif;color:var(--muted);margin:3pt 0 12pt}
+.cap b{color:var(--ink);font-weight:600}
+figure{margin:8pt 0 4pt;break-inside:avoid}
+figure img{width:100%;display:block}
+figure.shot img{border:.6pt solid var(--rule);border-radius:3pt}
+pre{font:7.8pt/1.45 "DejaVu Sans Mono",monospace;background:var(--code);border-left:2pt solid var(--seal);padding:7pt 9pt;margin:6pt 0 3pt;white-space:pre-wrap;break-inside:avoid}
+pre .c{color:#6b7c74}
+pre .k{color:#0b5a3a;font-weight:600}
+pre .s{color:#8a5a12}
+ol.refs{font-size:8.8pt;padding-left:16pt}
+ol.refs li{margin-bottom:3pt}
 </style>
 </head>
 <body>
 
-<h1>Sanad<span class="ar">سند</span></h1>
-<p class="sub">Grounded question answering over Saudi law in Arabic, and what LLM-written benchmarks hide</p>
-<p class="meta">Read Aloush · November 2026 · github.com/readaloush/sanad</p>
+<section class="cover">
+  <div class="top">
+    <p class="kind">Technical report · Read Aloush · November 2026</p>
+    <h1>Sanad <span class="ar">سند</span></h1>
+    <p class="sub">Grounded question answering over Saudi law in Arabic, and what LLM-written benchmarks hide</p>
+  </div>
+  <div class="shot"><img src="fig/demo-hero.png" alt="The Sanad demo page: a search box asking about Saudi law in Arabic"></div>
+  <div class="meta">
+    <div><b>Live demo</b>readaloush.github.io/sanad</div>
+    <div><b>Code and notebooks</b>github.com/readaloush/sanad</div>
+    <div><b>Author</b>Read Aloush<br>readaloush.com</div>
+  </div>
+  <div class="band"></div>
+</section>
 
-<div class="abstract"><p><b>Abstract.</b> Sanad answers questions about Saudi law in Arabic from the text of the statutes: it retrieves the relevant articles, answers from them with a numbered citation, and says so when the answer is not in what it was given. I compare lexical, dense, hybrid and reranked retrieval on a 5,929-passage corpus, fine-tune the retriever, and fine-tune ALLaM-7B-Instruct with QLoRA to cite and to abstain. Two test sets are used: 1,661 questions an LLM wrote while reading the passage (ArabLegalEval) and 79 questions people asked (Najiz QA). The main finding is that the two disagree. On LLM-written questions, word matching beats every embedding model and fine-tuning raises Recall@1 from 74.2% to 82.1%; on human questions the same fine-tuning lowers Recall@5 from 86.1% to 70.9%, and the fine-tuned answering model says "not found" for 44% of questions whose answer it was given. Rewriting the training questions in plain language and lowering the share of abstention examples cuts false "not found" to 11% and raises correct citation from 55% to 77% on human questions, at the cost of answering more often when the law is missing. A third run shows that the wording was not the cause: with 18% abstention examples instead of 12%, the model is back to refusing 44% of answerable human questions. Scoring the likelihood of "not found" and thresholding it gives a tunable trade-off, but thresholds chosen on LLM-written questions do not transfer, and the separation fine-tuning adds on them (AUC 0.81 → 0.95) almost vanishes on human questions (0.78 → 0.81). Every improvement measured on LLM-written questions in this project either failed to carry over to human questions or reversed.</p></div>
+<h2 style="margin-top:0">Abstract</h2>
+<div class="abstract">
+<p>Sanad answers questions about Saudi law in Arabic from the text of the statutes: it retrieves the relevant articles, answers from them with a numbered citation, and says so when the answer is not in what it was given. I compare lexical, dense, hybrid and reranked retrieval on a 5,929-passage corpus, fine-tune the retriever, and fine-tune ALLaM-7B-Instruct with QLoRA to cite and to abstain. Every result is reported on two test sets: 1,661 questions an LLM wrote while reading the passage (ArabLegalEval) and 79 questions people asked (Najiz QA).</p>
+<p>The two disagree at every stage. On LLM-written questions, word matching beats every embedding model and fine-tuning raises Recall@1 from 74.2% to 82.1%; on human questions the same fine-tuning lowers Recall@5 from 86.1% to 70.9%. Fine-tuning the answering model raises correct citations from 27% to 93% on the benchmark, but how often it refuses on human questions swings between 11% and 44% across training runs, including two runs with the same setting. A refusal threshold tuned on LLM-written questions does not transfer either. The conclusion is that a few hundred real questions, not a larger model, are what this kind of system needs next.</p>
+</div>
 
-<h2>1. Problem</h2>
-<p>Someone with a question about Saudi law usually asks it the way they would ask a friend: <span class="ar">إذا لم أتفق مع المحامي على أتعابه، فمن يحدد المبلغ؟</span> ("If I didn't agree a fee with my lawyer, who sets the amount?"). The answer sits in one article of one statute, written in formal legal Arabic. A general chatbot will answer anyway, without saying where the answer comes from, and will answer just as confidently when it does not know. For legal questions both failures matter more than fluency.</p>
-<p>Sanad is a retrieval-augmented system built around two requirements: every answer names the article it rests on, and when the retrieved articles do not contain the answer, the system says <span class="ar">«لا أجد الإجابة في النصوص المتاحة»</span> ("I can't find the answer in the available texts") instead of guessing. The project measures how well each part meets these requirements, on questions written by a model and on questions written by people.</p>
+<div class="keyfig">
+  <div><b>27% → 93%</b>correct article cited after fine-tuning (test set)</div>
+  <div><b>16% → 84%</b>says “not found” when the law is missing (test set)</div>
+  <div><b>86% → 71%</b>human-question Recall@5 after retriever fine-tuning</div>
+  <div><b>5 of 6</b>demo questions where the final search finds the right article</div>
+</div>
 
-<h2>2. Data</h2>
+<h3>Contents</h3>
+<ol class="toc">
+  <li><span>1</span>Problem</li><li><span>2</span>System overview</li><li><span>3</span>Data</li><li><span>4</span>Retrieval</li>
+  <li><span>5</span>Fine-tuning the retriever</li><li><span>6</span>The answering model</li><li><span>7</span>How the models were trained</li>
+  <li><span>8</span>When to say “not found”</li><li><span>9</span>Better search, answers that quote</li><li><span>10</span>Serving</li>
+  <li><span>11</span>Limitations and related work</li><li><span>12</span>Conclusion</li><li><span>A</span>Reproducing the results</li>
+</ol>
+
+<h2 class="pb"><span class="num">1</span>Problem</h2>
+<p>Someone with a question about Saudi law usually asks it the way they would ask a friend: <span class="ar">إذا لم أتفق مع المحامي على أتعابه، فمن يحدد المبلغ؟</span> (“If I didn’t agree a fee with my lawyer, who sets the amount?”). The answer sits in one article of one statute, written in formal legal Arabic. A general chatbot will answer anyway, without saying where the answer comes from, and will answer just as confidently when it does not know. For legal questions both failures matter more than fluency.</p>
+<p>Sanad is built around two requirements: every answer names the article it rests on, and when the retrieved articles do not contain the answer, the system says <span class="ar">«لا أجد الإجابة في النصوص المتاحة»</span> (“I can’t find the answer in the available texts”) instead of guessing. The project measures how well each part meets these requirements, on questions written by a model and on questions written by people.</p>
+
+<h2><span class="num">2</span>System overview</h2>
+<figure>
+<svg viewBox="0 0 660 220" xmlns="http://www.w3.org/2000/svg" font-family="Readex Pro, sans-serif" font-size="11">
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#55666B"/></marker></defs>
+  <g fill="#fff" stroke="#C9D1CE" stroke-width="1.2">
+    <rect x="6" y="40" width="118" height="70" rx="6"/>
+    <rect x="160" y="40" width="150" height="70" rx="6" stroke="#006C35"/>
+    <rect x="346" y="40" width="130" height="70" rx="6"/>
+    <rect x="512" y="40" width="142" height="70" rx="6" stroke="#006C35"/>
+    <rect x="160" y="150" width="150" height="58" rx="6" fill="#EEF3F0"/>
+    <rect x="512" y="150" width="142" height="58" rx="6" fill="#EEF3F0"/>
+  </g>
+  <g fill="#1B2A2F">
+    <text x="65" y="66" text-anchor="middle" font-weight="600">Question</text>
+    <text x="65" y="84" text-anchor="middle" fill="#55666B">plain Arabic</text>
+    <text x="235" y="62" text-anchor="middle" font-weight="600">Retriever</text>
+    <text x="235" y="80" text-anchor="middle" fill="#55666B">e5-base (dense), or</text>
+    <text x="235" y="96" text-anchor="middle" fill="#55666B">BM25 + bge-m3 + reranker</text>
+    <text x="411" y="66" text-anchor="middle" font-weight="600">Top 3 articles</text>
+    <text x="411" y="84" text-anchor="middle" fill="#55666B">numbered [1] [2] [3]</text>
+    <text x="583" y="62" text-anchor="middle" font-weight="600">ALLaM-7B + QLoRA</text>
+    <text x="583" y="80" text-anchor="middle" fill="#55666B">answer with [n], or</text>
+    <text x="583" y="96" text-anchor="middle" fill="#55666B">“not found”</text>
+    <text x="235" y="174" text-anchor="middle" font-weight="600">Statute corpus</text>
+    <text x="235" y="192" text-anchor="middle" fill="#55666B">5,929 passages · embedded once</text>
+    <text x="583" y="174" text-anchor="middle" font-weight="600">Service</text>
+    <text x="583" y="192" text-anchor="middle" fill="#55666B">FastAPI · ONNX on CPU · any LLM server</text>
+  </g>
+  <g stroke="#55666B" stroke-width="1.4" fill="none" marker-end="url(#a)">
+    <path d="M124 75H158"/><path d="M310 75H344"/><path d="M476 75H510"/><path d="M235 150V112"/><path d="M583 150V112"/>
+  </g>
+  <text x="6" y="22" fill="#55666B" font-size="10">Answer path, left to right; what each step rests on, below.</text>
+</svg>
+</figure>
+<p class="cap"><b>Figure 1.</b> The pipeline. The retriever ranks every statute passage against the question; the three best go to the language model in a fixed prompt; the model answers only from them, cites the passage number, or says the fixed “not found” sentence.</p>
+
+<h2><span class="num">3</span>Data</h2>
 <ul>
 <li><b>ArabLegalEval</b> [1]: 10,583 multiple-choice questions generated by GPT-4 and Claude 3 Opus from 5,725 passages of Saudi law. The repository states no licence, so it is used for evaluation and for training experiments whose outputs are not redistributed.</li>
 <li><b>Najiz QA</b>, from the same repository: 79 expert-verified questions taken from public FAQs of the Saudi Ministry of Justice portal, each with the legal text that answers it. These are the only human-written questions available.</li>
-<li><b>ALARB</b> [2] (Apache-2.0): about 13,000 Saudi commercial court cases with the statute articles each case cites. Its 717 distinct articles carry the law's name and the article number; they are added to the corpus and form the collection the public service and demo use.</li>
+<li><b>ALARB</b> [2] (Apache-2.0): about 13,000 Saudi commercial court cases with the statute articles each case cites. Its 717 distinct articles carry the law’s name and the article number; they are added to the corpus and form the public collection the service and demo use.</li>
 </ul>
-<p>After normalising and deduplicating, the corpus has 5,929 passages. Questions are split 70/15/15 by the passage they were written from (by a hash of the passage id), so a passage never answers both a training and a test question. The passages behind the Najiz questions are forced into the test split, and any training pair that touches a held-out passage is dropped (4,816 of 10,608 ALARB fact-to-article pairs). The resulting sets are 7,325 training, 1,597 development and 1,661 test questions.</p>
-<p>The ArabLegalEval questions were written by a model looking at the passage, so they reuse its words. This is the central caveat of the whole study, and it is why Najiz is reported next to every result even though 79 questions is small: one question is 1.3 percentage points.</p>
+<p>After normalising and deduplicating, the corpus has 5,929 passages. Questions are split 70/15/15 by the passage they were written from, so a passage never answers both a training and a test question. The passages behind the Najiz questions are forced into the test split, and any training pair that touches a held-out passage is dropped (4,816 of 10,608 ALARB fact-to-article pairs). The resulting sets are 7,325 training, 1,597 development and 1,661 test questions.</p>
+<p>The ArabLegalEval questions were written by a model looking at the passage, so they reuse its words. This is the central caveat of the study, and it is why Najiz is reported next to every result even though 79 questions is small: one question is 1.3 percentage points.</p>
 
-<h2>3. Retrieval baselines</h2>
+<h2><span class="num">4</span>Retrieval</h2>
 <p>Arabic text is normalised (diacritics and tatweel removed, alef forms unified, <span class="ar">ى</span>→<span class="ar">ي</span>, <span class="ar">ة</span>→<span class="ar">ه</span>, Arabic-Indic digits converted) and, for BM25, lightly stemmed by stripping article and conjunction prefixes such as <span class="ar">وال، بال، لل</span>. Dense retrievers use their documented prefixes (<code>query:</code> / <code>passage:</code> for e5). Hybrid retrieval fuses BM25 and bge-m3 rankings with reciprocal rank fusion [3]; the reranker is bge-reranker-v2-m3 over the fused top 20.</p>
+<figure><img src="fig/retrieval.svg" alt="Recall@1 per retriever on LLM-written and human questions"></figure>
+<p class="cap"><b>Figure 2.</b> Recall@1 for each retriever on the two test sets. Word matching (BM25) is the best single retriever on LLM-written questions and the worst on human ones; fine-tuning on LLM-written questions moves the two in opposite directions.</p>
 <table>
 <thead><tr><th>Retriever</th><th class="n">Test R@1</th><th class="n">R@10</th><th class="n">MRR@10</th><th class="n">Najiz R@1</th><th class="n">R@10</th><th class="n">MRR@10</th><th class="n">ms/query</th></tr></thead>
 <tbody>
@@ -65,11 +165,10 @@ b.best{font-weight:600}
 <tr><td>BM25 + bge-m3 (RRF)</td><td class="n">83.1</td><td class="n">97.2</td><td class="n">.883</td><td class="n">63.3</td><td class="n">79.7</td><td class="n">.681</td><td class="n"></td></tr>
 <tr><td>the same + bge-reranker-v2-m3</td><td class="n"><b class="best">85.9</b></td><td class="n"><b class="best">98.4</b></td><td class="n"><b class="best">.909</b></td><td class="n">64.6</td><td class="n"><b class="best">93.7</b></td><td class="n">.740</td><td class="n"></td></tr>
 </tbody></table>
-<p class="cap"><b>Table 1.</b> Retrieval over 5,929 passages. Test: 1,661 LLM-written questions; Najiz: 79 human-written questions. Timings per query on a Kaggle T4 with the corpus already encoded.</p>
-<p>On LLM-written questions BM25 beats every embedding model at Recall@1. On human questions it falls to 40.5% while the embedding models reach 63–66%, and fusing BM25 in costs 8–10 points of Recall@10, which the reranker wins back. The differences between embedding models on Najiz are one or two questions and not meaningful. multilingual-e5-base was kept for the rest of the work: on human questions it is within two questions of the larger models at a third of the parameters and less than half the latency.</p>
+<p class="cap"><b>Table 1.</b> Retrieval over 5,929 passages. Timings per query on a Kaggle T4 with the corpus already encoded.</p>
+<p>On human questions BM25 falls to 40.5% while the embedding models reach 63–66%, and fusing BM25 in costs 8–10 points of Recall@10, which the reranker wins back. The differences between embedding models on Najiz are one or two questions and not meaningful. multilingual-e5-base was kept for the experiments that follow: on human questions it is within two questions of the larger models at a third of the parameters and less than half the latency.</p>
 
-<h2>4. Fine-tuning the retriever</h2>
-<p>e5-base was fine-tuned for two epochs with in-batch negatives (cached multiple-negatives ranking loss, no duplicate passages within a batch) and one mined hard negative per pair, selected by development-set MRR.</p>
+<h2><span class="num">5</span>Fine-tuning the retriever</h2>
 <table>
 <thead><tr><th>Training data</th><th class="n">Test R@1 / R@5 / R@10 / MRR</th><th class="n">Najiz R@1 / R@5 / R@10 / MRR</th></tr></thead>
 <tbody>
@@ -81,12 +180,11 @@ b.best{font-weight:600}
 <tr><td>both wordings (4,796 pairs)</td><td class="n">77.3 / 93.0 / 96.0 / .840</td><td class="n">59.5 / 73.4 / 81.0 / .660</td></tr>
 </tbody></table>
 <p class="cap"><b>Table 2.</b> Retriever fine-tuning, dense retrieval only. Every fine-tuned model loses at least 12 points of Recall@5 on human questions.</p>
-<p>Fine-tuning gains eight points of Recall@1 on questions like the training ones and loses on the questions people asked: Recall@5 falls from 86.1% to 70.9%, twelve of 79 questions. Model selection by development MRR picks the fine-tuned model, because the development set is LLM-written too; a pipeline that only looked at its own benchmark would ship the worse retriever. Rewriting the training questions in plain language (Section 6) does not fix this. The rewrites are still produced by a model, and the question–passage pairs they encode are still the ones a model chose, so the retriever learns the benchmark rather than the people. The deployed system uses the starting e5-base model with dense retrieval only.</p>
+<p>Fine-tuning gains eight points of Recall@1 on questions like the training ones and loses on the questions people asked: Recall@5 falls from 86.1% to 70.9%, twelve of 79 questions. Model selection by development MRR picks the fine-tuned model, because the development set is LLM-written too; a pipeline that only looked at its own benchmark would ship the worse retriever. Rewriting the training questions in plain language (Section 8) does not fix this: the question–passage pairs are still the ones a model chose, so the retriever learns the benchmark rather than the people. The experiments keep the starting e5-base model.</p>
 
-<h2>5. The answering model</h2>
-<p>Two openly licensed 7B instruction models were compared, both loaded in 4-bit NF4 on a single T4: ALLaM-7B-Instruct [6], trained by SDAIA with a large Arabic share, and Qwen2.5-7B-Instruct [7]. Each sees the top three retrieved passages, numbered, under a system prompt that asks for a one- or two-sentence answer with the passage number in brackets, and for the fixed "not found" sentence otherwise.</p>
+<h2><span class="num">6</span>The answering model</h2>
+<p>Two openly licensed 7B instruction models were compared, both loaded in 4-bit NF4 on one T4: ALLaM-7B-Instruct [6], trained by SDAIA with a large Arabic share, and Qwen2.5-7B-Instruct [7]. Each sees the top three retrieved passages, numbered, under a system prompt that asks for a one- or two-sentence answer with the passage number in brackets, and for the fixed “not found” sentence otherwise.</p>
 <h3>Multiple choice</h3>
-<p>Accuracy is read from the next-token probabilities of the letters A–D, with no context (closed book), with the top three retrieved passages, and with the gold passage alone.</p>
 <table>
 <thead><tr><th>Model</th><th class="n">Closed book</th><th class="n">Retrieved top 3</th><th class="n">Gold passage</th></tr></thead>
 <tbody>
@@ -95,11 +193,10 @@ b.best{font-weight:600}
 <tr><td>ALLaM + QLoRA, 25% abstention examples</td><td class="n">67.0</td><td class="n"><b class="best">96.5</b></td><td class="n">98.8</td></tr>
 <tr><td>ALLaM + QLoRA, plain-language rewrites, 12%</td><td class="n">68.8</td><td class="n">95.0</td><td class="n"><b class="best">99.0</b></td></tr>
 </tbody></table>
-<p class="cap"><b>Table 3.</b> Multiple-choice accuracy (%) on 400 test questions. The gold passage is among the top three retrieved for 87% of them.</p>
+<p class="cap"><b>Table 3.</b> Multiple-choice accuracy (%) on 400 test questions, read from the next-token probabilities of the letters A–D. The gold passage is among the top three retrieved for 87% of them.</p>
 <p>Retrieval is worth 26 points. Fine-tuning does not add legal knowledge (closed book is unchanged) but makes better use of the passages provided. On the development set ALLaM led Qwen with retrieved passages (94.0% against 92.0%), so ALLaM was chosen for fine-tuning.</p>
 <h3>Grounded answers</h3>
-<p>For free-form answers four things are measured on 150 test questions and the 79 Najiz questions: whether the answer cites the gold passage; whether the model wrongly says "not found" although the gold passage is in its context; whether it says "not found" when the gold passage has been removed from the context (the same question, now unanswerable from what it sees); and token F1 against the reference answer, with citations stripped.</p>
-<p>QLoRA trains rank-16 adapters on every linear layer of the 4-bit model, 1,600 examples, one epoch, learning rate 2·10<sup>−4</sup>, effective batch 8. Each example is a training question with its top three retrieved passages. With probability <i>p</i> the gold passage is removed and the target is the "not found" sentence; otherwise the gold passage is put in the context if the retriever missed it, and the target is the short reference answer followed by its passage number. No development, test or Najiz question or passage is used.</p>
+<p>For free-form answers four things are measured: whether the answer cites the gold passage; whether the model wrongly says “not found” although the gold passage is in its context; whether it says “not found” when the gold passage has been removed (the same question, now unanswerable from what it sees); and token F1 against the reference answer, with citations stripped.</p>
 <table>
 <thead><tr><th>Model</th><th>Set</th><th class="n">Cites gold</th><th class="n">"Not found" when law is missing</th><th class="n">False "not found"</th><th class="n">Answer F1</th></tr></thead>
 <tbody>
@@ -111,12 +208,66 @@ b.best{font-weight:600}
 <tr><td>ALLaM + QLoRA, <i>p</i> = 0.25</td><td>Najiz</td><td class="n">55%</td><td class="n"><b class="best">86%</b></td><td class="n">44%</td><td class="n">0.47</td></tr>
 </tbody></table>
 <p class="cap"><b>Table 4.</b> Grounded answers on 150 test questions (135 with the gold passage in the top 3) and the 79 Najiz questions (62 with it in the top 3). The unanswerable versions use all questions.</p>
-<p>Before fine-tuning, ALLaM answered 84% of test questions whose law it had not been given and cited the right passage only 27% of the time; Qwen cited much better (90%) but still answered most unanswerable questions. Fine-tuning with <i>p</i> = 0.25 fixes both on LLM-written questions: 93% correct citations, 84% correct abstention, F1 from 0.42 to 0.80.</p>
-<p>On human questions it overcorrects. It says "not found" for 44% of the Najiz questions whose answer is in front of it. One explanation, tested in Section 6, is the same as in Section 4: in training, the answerable examples were LLM-written questions that share words with their passage, so the model learned that a missing word overlap means a missing answer, and people do not use the words of the law.</p>
+<p>Before fine-tuning, ALLaM answered 84% of test questions whose law it had not been given and cited the right passage only 27% of the time. Fine-tuning fixes both on LLM-written questions: 93% correct citations, 84% correct abstention, F1 from 0.42 to 0.80. On human questions it overcorrects and says “not found” for 44% of the questions whose answer is in front of it.</p>
 
-<h2>6. Training on how people ask</h2>
-<p>To test that explanation, Qwen2.5-7B-Instruct rewrote 2,400 training questions in the style of a non-lawyer, seeing only the question and never the passage; 2,396 rewrites were usable. They are moderate paraphrases, with some drift in meaning. ALLaM was then fine-tuned on the rewritten questions. Because this step changes two things at once (the wording and the share of abstention examples), a third run used the same rewrites with 18% abstention examples, between the two.</p>
-<p>The rewritten training cut false "not found" on human questions from 44% to 11% and raised correct citations from 55% to 77%. The price is the opposite failure: with the relevant article removed, the model now answers more than half the time, usually from a neighbouring article. The share of abstention examples looks like a dial between refusing too often and answering too readily. </p>
+<h2 class="pb"><span class="num">7</span>How the models were trained</h2>
+<p>All training ran on free Kaggle T4 GPUs (16 GB), one notebook per step; Appendix A lists them. The settings below are the defaults in the code; every run uses one seed.</p>
+<table>
+<thead><tr><th>Setting</th><th>Retriever (multilingual-e5-base)</th><th>Answering model (ALLaM-7B-Instruct)</th></tr></thead>
+<tbody>
+<tr><td>Method</td><td>Full fine-tuning, sentence-transformers</td><td>QLoRA: 4-bit NF4 base, rank-16 adapters on every linear layer</td></tr>
+<tr><td>Training data</td><td>question → gold passage, plus one mined hard negative</td><td>1,600 examples: 3 retrieved passages + target answer</td></tr>
+<tr><td>Loss</td><td>Cached multiple-negatives ranking (in-batch negatives)</td><td>Cross-entropy on the answer tokens only</td></tr>
+<tr><td>Batch</td><td>128 (mini-batch 16), no duplicate passages per batch</td><td>1 sequence, gradient accumulation 8</td></tr>
+<tr><td>Learning rate</td><td>2·10<sup>−5</sup>, 10% warm-up</td><td>2·10<sup>−4</sup>, cosine, 5% warm-up, AdamW, grad-norm clip 1.0</td></tr>
+<tr><td>Epochs / time</td><td>2 epochs, 3–10 minutes</td><td>1 epoch (200 steps), about 45–50 minutes</td></tr>
+<tr><td>Trainable parameters</td><td>278 M (all)</td><td>40 M of 7.04 B (0.57%)</td></tr>
+<tr><td>Precision</td><td>fp16 mixed precision</td><td>fp16 autocast with gradient scaling, gradient checkpointing</td></tr>
+</tbody></table>
+<p class="cap"><b>Table 5.</b> Training settings. Model selection for the retriever uses development-set MRR, which, as Section 5 shows, favours the wrong model.</p>
+
+<h3>Retriever: in-batch negatives</h3>
+<p>Each training pair is a question and the passage it was written from. The loss treats every other passage in the batch as a negative, so a large batch gives many negatives cheaply; the cached variant computes the large batch in mini-batches to fit the GPU, and one mined hard negative per pair (a high-ranked wrong passage) makes the task harder than random negatives.</p>
+<pre><span class="k">from</span> sentence_transformers.losses <span class="k">import</span> CachedMultipleNegativesRankingLoss
+<span class="k">from</span> sentence_transformers.training_args <span class="k">import</span> BatchSamplers
+
+ds = Dataset.from_dict({<span class="s">"anchor"</span>: questions, <span class="s">"positive"</span>: gold_passages, <span class="s">"negative"</span>: hard_negatives})
+loss = CachedMultipleNegativesRankingLoss(model, mini_batch_size=<span class="s">16</span>)
+args = SentenceTransformerTrainingArguments(
+    num_train_epochs=<span class="s">2</span>, per_device_train_batch_size=<span class="s">128</span>, learning_rate=<span class="s">2e-5</span>, warmup_ratio=<span class="s">0.1</span>,
+    fp16=<span class="k">True</span>, batch_sampler=BatchSamplers.NO_DUPLICATES)   <span class="c"># no passage twice in a batch</span>
+SentenceTransformerTrainer(model=model, args=args, train_dataset=ds, loss=loss).train()</pre>
+<p class="cap"><b>Listing 1.</b> Retriever fine-tuning (<code>sanad/finetune_retriever.py</code>, shortened).</p>
+
+<h3>Answering model: teaching it to cite and to refuse</h3>
+<p>Each training example is a training question with its three retrieved passages. With probability <i>p</i> the gold passage is removed and the target is the fixed “not found” sentence; otherwise the gold passage is put into the context if the retriever missed it, and the target is the short answer followed by the passage number. No development, test or Najiz question or passage is used.</p>
+<pre><span class="k">for</span> q <span class="k">in</span> questions:
+    r = [p <span class="k">for</span> p <span class="k">in</span> ranked[q.qid] <span class="k">if</span> p <span class="k">not in</span> held_out <span class="k">or</span> p == q.gold]
+    <span class="k">if</span> rng.random() &lt; p_unanswerable:                      <span class="c"># the law is not in the context</span>
+        ctx = [p <span class="k">for</span> p <span class="k">in</span> r <span class="k">if</span> p != q.gold][:3]
+        target = ABSTAIN                                   <span class="c"># «لا أجد الإجابة في النصوص المتاحة.»</span>
+    <span class="k">else</span>:                                                  <span class="c"># the law is there: answer and cite</span>
+        ctx = r[:3]
+        <span class="k">if</span> q.gold <span class="k">not in</span> ctx:
+            ctx[rng.randrange(3)] = q.gold
+        target = <span class="s">f"{q.answer} [{ctx.index(q.gold) + 1}]"</span>
+    examples.append((rag_messages(q.text, [text[p] <span class="k">for</span> p <span class="k">in</span> ctx]), target))</pre>
+<p class="cap"><b>Listing 2.</b> Building the fine-tuning examples (<code>sanad/sft.py</code>, shortened).</p>
+<pre>model = AutoModelForCausalLM.from_pretrained(<span class="s">"ALLaM-AI/ALLaM-7B-Instruct-preview"</span>,
+    quantization_config=BitsAndBytesConfig(load_in_4bit=<span class="k">True</span>, bnb_4bit_quant_type=<span class="s">"nf4"</span>,
+        bnb_4bit_compute_dtype=torch.float16, bnb_4bit_use_double_quant=<span class="k">True</span>))
+model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=<span class="k">True</span>)
+linear = {n.split(<span class="s">"."</span>)[-1] <span class="k">for</span> n, m <span class="k">in</span> model.named_modules() <span class="k">if</span> isinstance(m, torch.nn.Linear)} - {<span class="s">"lm_head"</span>}
+model = get_peft_model(model, LoraConfig(r=<span class="s">16</span>, lora_alpha=<span class="s">32</span>, lora_dropout=<span class="s">0.05</span>,
+                                         task_type=<span class="s">"CAUSAL_LM"</span>, target_modules=sorted(linear)))
+<span class="c"># trainable params: 39,976,960 || all params: 7,040,536,576 || trainable%: 0.5678</span>
+<span class="k">with</span> torch.autocast(<span class="s">"cuda"</span>, dtype=torch.float16):
+    loss = model(input_ids=x, labels=y).loss / accum      <span class="c"># labels = -100 on the prompt tokens</span>
+scaler.scale(loss).backward()</pre>
+<p class="cap"><b>Listing 3.</b> QLoRA set-up and the training step. A plain PyTorch loop with gradient scaling, accumulation and clipping, rather than a trainer class, kept memory predictable on a 16 GB GPU.</p>
+
+<h2 class="pb"><span class="num">8</span>When to say “not found”</h2>
+<p>To test whether the overcorrection came from wording, Qwen2.5-7B-Instruct rewrote 2,400 training questions in the style of a non-lawyer, seeing only the question and never the passage; 2,396 rewrites were usable. ALLaM was then fine-tuned on the rewrites with 12% “not found” examples, and again with 18%, and later, with 12% again, trained to quote its source (Section 9).</p>
 <table>
 <thead><tr><th>Abstention examples, training questions</th><th>Set</th><th class="n">Cites gold</th><th class="n">"Not found" when law is missing</th><th class="n">False "not found"</th><th class="n">Answer F1</th></tr></thead>
 <tbody>
@@ -126,11 +277,15 @@ b.best{font-weight:600}
 <tr><td>25%, original wording</td><td>test</td><td class="n">93%</td><td class="n">84%</td><td class="n">7%</td><td class="n">0.80</td></tr>
 <tr><td>12%, plain-language rewrites</td><td>test</td><td class="n">96%</td><td class="n">40%</td><td class="n">2%</td><td class="n">0.81</td></tr>
 <tr><td>18%, plain-language rewrites</td><td>test</td><td class="n">90%</td><td class="n">65%</td><td class="n">5%</td><td class="n">0.82</td></tr>
+<tr><td>12%, answer + quote</td><td>Najiz</td><td class="n">56%</td><td class="n">73%</td><td class="n">37%</td><td class="n">0.47</td></tr>
+<tr><td>12%, answer + quote</td><td>test</td><td class="n">92%</td><td class="n">68%</td><td class="n">7%</td><td class="n">0.31</td></tr>
 </tbody></table>
-<p class="cap"><b>Table 5.</b> The abstention share in training. On human questions the 18% run is indistinguishable from the 25% run without rewrites.</p>
-<p>The 18% run lands exactly where the 25% run did on human questions, so the plain-language wording was not what reduced false refusals; the lower share of abstention examples was. The behaviour also does not move smoothly with the share: on Najiz it flips between 12% and 18%. With one run per setting some of that jump may be noise between training runs, but either way retraining is an unreliable way to choose it.</p>
+<p class="cap"><b>Table 6.</b> The share of “not found” examples in training. Every row is one training run.</p>
+<p>The 12% run cut false “not found” on human questions to 11% and raised correct citations to 77%. The 18% run landed exactly where the 25% run did, so the wording was not what helped. Then a second 12% run, which changed only the form of the answer, refused 37% of answerable human questions. With one run per setting the share of “not found” examples looks like a dial; with two runs at the same setting it looks like noise. Retraining is not a reliable way to choose this behaviour.</p>
 <h3>A threshold instead of a training ratio</h3>
-<p>The alternative is to leave the trained model alone and decide afterwards. For each question I score the mean log-probability of the "not found" sentence, teacher-forced after the prompt, and say "not found" when it exceeds a threshold. If the score separates answerable from unanswerable questions, any point on the trade-off can be chosen without retraining.</p>
+<p>The alternative leaves the trained model alone and decides afterwards. For each question the model’s log-probability of the “not found” sentence is a score; above a threshold, the system refuses. Figure 3 places every run and every threshold on the same trade-off.</p>
+<figure><img src="fig/notfound.svg" alt="Trade-off between refusing answerable questions and catching unanswerable ones"></figure>
+<p class="cap"><b>Figure 3.</b> On the 79 human questions: wrongly refusing (x, lower is better) against correctly refusing when the law is missing (y, higher is better). The ideal is the top-left corner. Green dots are single training runs; lines are thresholds on two models, chosen on LLM-written development questions.</p>
 <table>
 <thead><tr><th>Model</th><th class="n">AUC dev</th><th class="n">AUC test</th><th class="n">AUC Najiz</th><th class="n">Test at 2% dev target</th><th class="n">Najiz at 2% dev target</th></tr></thead>
 <tbody>
@@ -139,12 +294,24 @@ b.best{font-weight:600}
 <tr><td>QLoRA, 12%, rewrites</td><td class="n">0.89</td><td class="n">0.89</td><td class="n">0.79</td><td class="n">5.2% / 59%</td><td class="n">32.3% / 71%</td></tr>
 <tr><td>QLoRA, 18%, rewrites</td><td class="n">0.89</td><td class="n">0.89</td><td class="n">0.81</td><td class="n">5.2% / 65%</td><td class="n">50.0% / 90%</td></tr>
 </tbody></table>
-<p class="cap"><b>Table 6.</b> AUC: probability that an unanswerable question scores above an answerable one. Right columns: false "not found" / "not found" when the law is missing, with the threshold chosen on 150 development questions for 2% false "not found".</p>
-<p>Fine-tuning makes the model much better at telling when the answer is missing on questions like its training data, and barely better on questions people asked: 0.78 to 0.81, within the noise of 62 answerable and 79 unanswerable questions. A threshold chosen on LLM-written questions does not carry over: 2% false "not found" on test becomes 32% on Najiz, because every human question looks less answerable to the model. The released model with a threshold at a 10% development target reaches 11% false "not found" and 49% correct "not found" on Najiz, about the same as the best fine-tuned run (11% and 46%), with no training. Calibrating the threshold needs a few hundred real questions.</p>
-<p>One measurement caveat applies to every "says not found when the law is missing" figure. ArabLegalEval passages overlap (518 of them also appear among the ALARB articles, and many laws repeat provisions), so when the gold passage is removed, a neighbouring passage sometimes still contains the answer. Some answers counted as failures to abstain are therefore correct. The figure is a lower bound on the model's real abstention quality, not an exact rate.</p>
+<p class="cap"><b>Table 7.</b> AUC is the chance that an unanswerable question scores above an answerable one. Right columns: false “not found” / “not found” when the law is missing, with the threshold set on 150 development questions for 2% false “not found”.</p>
+<pre>tail = tok(ABSTAIN, add_special_tokens=<span class="k">False</span>)[<span class="s">"input_ids"</span>]          <span class="c"># the "not found" sentence</span>
+ids = torch.cat([prompt_ids, torch.tensor([tail] * n)], 1)
+logits = model(input_ids=ids, attention_mask=mask).logits[:, -len(tail) - 1:-1, :]
+score = torch.log_softmax(logits.float(), -1).gather(2, ids[:, -len(tail):, <span class="k">None</span>]).mean((1, 2))</pre>
+<p class="cap"><b>Listing 4.</b> The “not found” score: the mean log-probability of the fixed sentence, teacher-forced after the prompt (<code>sanad/abstain_curve.py</code>).</p>
+<p>Fine-tuning makes the model much better at telling when the answer is missing on questions like its training data (AUC 0.81 → 0.95) and barely better on questions people asked (0.78 → 0.81, within the noise of 79 questions). A threshold chosen on LLM-written questions does not carry over: 2% false “not found” on test becomes 32% on Najiz. The released model with a threshold reaches about the same point on human questions as the best fine-tuned run, with no training at all.</p>
+<p>One caveat applies to every “says not found when the law is missing” figure. Passages overlap, so when the gold passage is removed a neighbouring one sometimes still contains the answer; some answers counted as failures to refuse are correct. The figure is a lower bound.</p>
 
-<h2>7. Serving</h2>
-<p>The service has no PyTorch dependency. The retriever is exported to ONNX with L2 normalisation built in (1.1 GB in float32) and runs with ONNX Runtime and the <code>tokenizers</code> library; an int8 version is 278 MB, with the cost shown below. The 717 ALARB articles are embedded in advance and stored in float16. The language model is reached through any OpenAI-compatible endpoint (vLLM, llama.cpp or Ollama), so it can be swapped without changing the service. A FastAPI app exposes <code>/search</code> and <code>/ask</code>; <code>/ask</code> returns the answer, whether it is a "not found", each source with its law name, article number and score, which sources were cited, and any citation number that does not refer to a provided source. A Docker image and tests with a tiny ONNX model and a fake LLM are included.</p>
+<h2 class="pb"><span class="num">9</span>Better search, answers that quote</h2>
+<p>The public demo answers eight plain-language questions over the 717 ALARB articles. With e5-base alone, the article that answers the question came back for only three of the six questions whose law is in the collection, and the fine-tuned models then said “not found”, correctly for what they were given. Regenerating the demo with the best search from Section 4 (BM25 and bge-m3 fused, then reranked) brought the right article for five of six.</p>
+<p>The fine-tuned models answered in a few words (“the court [1]”) because the training targets were short. A second 12% run used targets made of the short answer followed by the sentence of the cited article it rests on, chosen automatically as the sentence sharing the most words with the answer and question. On the demo questions every quoted sentence is copied word for word from the cited article.</p>
+<figure class="shot"><img src="fig/demo-answer.png" alt="One demo question answered by the three models, with the quoting model showing the article sentence"></figure>
+<p class="cap"><b>Figure 4.</b> One demo question: “I worked as a lawyer for a company and left; when may I appear against it?” All three models answer five years. The released model attributes it to article 1, which is wrong; the short model cites [1]; the quoting model also shows the sentence of article 14 it rests on.</p>
+<p>The quoting model is easier to trust when it answers, but it refused more often (Table 6, last rows). On the demo it said “not found” for two of the five questions whose article it had been given.</p>
+
+<h2><span class="num">10</span>Serving</h2>
+<p>The service has no PyTorch dependency. The retriever is exported to ONNX with L2 normalisation built in and runs with ONNX Runtime and the <code>tokenizers</code> library; the 717 articles are embedded in advance. The language model is reached through any OpenAI-compatible endpoint (vLLM, llama.cpp or Ollama), so it can be swapped without changing the service. A FastAPI app exposes <code>/search</code> and <code>/ask</code>; <code>/ask</code> returns the answer, whether it is a “not found”, each source with its law, article number and score, which sources were cited, and any citation number that points at no source. A Docker image and tests with a tiny model and a fake LLM are included.</p>
 <table>
 <thead><tr><th>Retriever on CPU</th><th class="n">Test R@1 / R@5 / R@10</th><th class="n">Najiz R@1 / R@5 / R@10</th><th class="n">ms / passage</th></tr></thead>
 <tbody>
@@ -152,23 +319,38 @@ b.best{font-weight:600}
 <tr><td>PyTorch float32, 256 tokens</td><td class="n">74.7 / 91.0 / 94.5</td><td class="n">63.3 / 87.3 / 88.6</td><td class="n">166</td></tr>
 <tr><td>ONNX, default dynamic int8 (all ops, per tensor)</td><td class="n">69.2 / 87.5 / 92.2</td><td class="n">50.6 / 73.4 / 81.0</td><td class="n">354</td></tr>
 </tbody></table>
-<p class="cap"><b>Table 7.</b> The cost of serving choices, measured on the full corpus on a Kaggle CPU.</p>
-<p>Truncating inputs to 256 tokens costs nothing. Default dynamic int8 quantisation, which looked harmless by cosine similarity to the original embeddings (minimum 0.94 on 64 passages), costs 13 points of Recall@1 on human questions and was also slower on this CPU. The service therefore uses the float32 model; quantising only the matrix multiplications with per-channel scales is being measured. A cosine check is not a retrieval check.</p>
+<p class="cap"><b>Table 8.</b> The cost of serving choices, on the full corpus on a Kaggle CPU. The float32 ONNX export gives exactly the PyTorch numbers.</p>
+<p>Truncating inputs to 256 tokens costs nothing. Default dynamic int8 quantisation looked harmless by cosine similarity to the original embeddings (minimum 0.94 on 64 passages) but cost 13 points of Recall@1 on human questions and was slower on this CPU; quantising only the matrix multiplications with per-channel scales was worse still (43.0%). The service uses the float32 model. A cosine check is not a retrieval check.</p>
 
-<h2>8. Limitations</h2>
+<h2><span class="num">11</span>Limitations and related work</h2>
 <ul>
-<li><b>The human test set is small and no longer untouched.</b> Najiz has 79 questions; differences of one or two questions are noise. Its results also motivated Section 6, so it served partly as a development set from that point on. There is no other public human-written test set for Saudi law that I know of.</li>
-<li><b>One run per configuration.</b> No seeds were repeated, so no confidence intervals are given.</li>
-<li><b>Token F1 understates human-question quality.</b> Najiz reference answers are whole paragraphs; a correct one-sentence answer scores low.</li>
-<li><b>Coverage.</b> The served collection is 717 articles, mostly civil procedure, companies, commercial courts, evidence, bankruptcy and the legal profession. Labour, traffic and personal-status law are largely absent. The system is a study, not legal advice.</li>
-<li><b>Licences.</b> ArabLegalEval has no stated licence; its passages are not redistributed, and the public index uses ALARB only.</li>
+<li><b>The human test set is small and no longer untouched.</b> Najiz has 79 questions; one or two questions are noise. Its results guided the later steps, so it served partly as a development set.</li>
+<li><b>One run per configuration.</b> Section 8 shows that two runs with the same setting can differ by 26 points on human questions; no confidence intervals are given.</li>
+<li><b>Token F1 is a weak measure here.</b> Najiz reference answers are whole paragraphs and test answers are short phrases, so F1 moves with answer length as much as with correctness.</li>
+<li><b>Coverage.</b> The public collection is 717 articles, mostly civil procedure, companies, commercial courts, evidence, bankruptcy and the legal profession. Labour, traffic and personal-status law are largely absent. The system is a study, not legal advice.</li>
 </ul>
+<p>ArabLegalEval [1] introduced the benchmark used here and evaluated LLMs on it, largely on multiple-choice, LLM-written questions. Several open projects apply retrieval-augmented generation to Saudi labour law, and commercial Saudi legal assistants exist. The contribution of this project is not the idea of a Saudi legal RAG system but the measurement: separating LLM-written from human-written questions at every stage, showing that the usual training and model-selection signals point the wrong way on the latter, and treating refusal as a measured behaviour rather than a prompt instruction.</p>
 
-<h2>9. Related work</h2>
-<p>ArabLegalEval [1] introduced the benchmark used here and evaluated LLMs on it, largely on multiple-choice and LLM-written questions. Several open projects apply retrieval-augmented generation to Saudi labour law, and commercial Saudi legal assistants exist. The contribution of this project is not the idea of a Saudi legal RAG system but the measurement: separating LLM-written from human-written questions at every stage, showing that the usual training and model-selection signals point the wrong way on the latter, and treating abstention as a measured, tunable behaviour rather than a prompt instruction.</p>
+<h2><span class="num">12</span>Conclusion</h2>
+<p>A 7B Arabic model with a small retriever can answer questions about the Saudi statutes it is given with a correct citation most of the time, and 1,600 training examples are enough to teach it to cite and to refuse. The more useful lesson is about evaluation. Benchmarks written by a model from the source text reward word matching, and every improvement measured on them in this project (a fine-tuned retriever, hybrid retrieval, cheaper quantisation, refusal thresholds) either did not carry over to the questions people ask or made the system worse for them. A few dozen real questions changed every decision that mattered. The most valuable next step is not a larger model but a few hundred real questions, to choose the retriever, the refusal threshold and the training data against, and repeated training runs to tell a real gain from a lucky one.</p>
 
-<h2>10. Conclusion</h2>
-<p>A 7B Arabic model with a small dense retriever can answer questions about the Saudi statutes it is given with a correct citation most of the time, and fine-tuning on 1,600 examples is enough to teach it to cite and to refuse. The more useful lesson is about evaluation. Benchmarks written by a model from the source text reward word matching, and every improvement measured on them in this project (fine-tuned retrievers, hybrid retrieval, cheaper quantisation, abstention thresholds) either did not carry over to the questions people ask or made the system worse for them. A few dozen real questions changed every decision that mattered. The single most valuable next step is not a larger model but a few hundred real questions, to choose the retriever, the abstention threshold and the training data against.</p>
+<h2><span class="num">A</span>Reproducing the results</h2>
+<p>Every number comes from a notebook in the repository, run on Kaggle (Internet on). The code is cloned fresh in each notebook, and the datasets are downloaded when it runs; nothing from ArabLegalEval is stored in the repository.</p>
+<table>
+<thead><tr><th>Notebook</th><th>What it does</th><th>Hardware</th></tr></thead>
+<tbody>
+<tr><td>01_retrieval_baselines</td><td>BM25, e5, bge-m3, fusion and reranker (Table 1)</td><td>T4</td></tr>
+<tr><td>02_finetune_retriever</td><td>Retriever fine-tuning recipes (Table 2)</td><td>T4</td></tr>
+<tr><td>03_answering_model</td><td>ALLaM vs Qwen, first QLoRA run (Tables 3–4)</td><td>T4</td></tr>
+<tr><td>04_plain_language</td><td>Question rewrites, retriever and 12% QLoRA run</td><td>T4</td></tr>
+<tr><td>05_build_index</td><td>ONNX export and the served index</td><td>T4</td></tr>
+<tr><td>06_not_found_dial</td><td>18% QLoRA run and demo answers</td><td>T4</td></tr>
+<tr><td>07_onnx_check</td><td>Serving cost: truncation, ONNX, int8 (Table 8)</td><td>CPU</td></tr>
+<tr><td>08_abstain_threshold</td><td>“Not found” scores, AUC and thresholds (Table 7)</td><td>T4</td></tr>
+<tr><td>09_demo_rerank</td><td>Demo answers with BM25 + bge-m3 + reranker</td><td>T4</td></tr>
+<tr><td>10_full_answers</td><td>Answer + quote QLoRA run</td><td>T4</td></tr>
+</tbody></table>
+<p class="cap"><b>Table 9.</b> The notebooks, in order. Each writes its numbers to a JSON file and prints the tables shown in this report.</p>
 
 <h2>References</h2>
 <ol class="refs">
@@ -182,6 +364,5 @@ b.best{font-weight:600}
 <li>T. Dettmers et al. QLoRA: efficient finetuning of quantized LLMs. NeurIPS 2023.</li>
 <li>S. Robertson, H. Zaragoza. The probabilistic relevance framework: BM25 and beyond. 2009.</li>
 </ol>
-
 </body>
 </html>
