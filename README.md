@@ -83,3 +83,33 @@ QLoRA (rank 16, 1,600 examples, 25% of them with the gold passage removed and th
 On human questions it overcorrects: it says "not found" for 44% of questions whose answer is in front of it, because people do not use the wording of the law and the model learned that missing wording means a missing answer. Step 4 retrains on plain-language rewrites with fewer "not found" examples.
 
 Najiz answer F1 understates quality: the reference answers are whole paragraphs, while the model answers in a sentence, so a correct short answer scores low.
+
+## Step 4: training on how people actually ask
+
+Qwen2.5-7B rewrote 2,400 training questions in the plain style of a citizen (it saw only the question, never the passage); 2,396 rewrites were usable. They are moderate paraphrases, with some drift in meaning.
+
+**Retriever** (Recall@1 / @5 / @10 / MRR@10; each recipe trains on 2,400 pairs, the last on both sets):
+
+| Training data | Retrieval | Test | Najiz |
+|---|---|---|---|
+| none (starting model) | dense | 74.2 / 91.0 / 94.3 / 0.815 | **63.3 / 86.1 / 87.3 / 0.715** |
+| none (starting model) | hybrid | 80.7 / 94.8 / 96.6 / 0.866 | 55.7 / 75.9 / 81.0 / 0.639 |
+| original questions | dense | 76.1 / 91.0 / 94.6 / 0.826 | 54.4 / 72.2 / 78.5 / 0.622 |
+| plain-language rewrites | dense | 73.8 / 89.5 / 92.9 / 0.806 | 55.7 / 73.4 / 77.2 / 0.628 |
+| original + rewrites | dense | 77.3 / 93.0 / 96.0 / 0.840 | 59.5 / 73.4 / 81.0 / 0.660 |
+| original + rewrites | hybrid | **81.8 / 94.6 / 97.0 / 0.873** | 51.9 / 73.4 / 81.0 / 0.609 |
+
+Rewriting the questions does not fix the retriever. Every fine-tuned recipe loses at least 12 points of Recall@5 on human questions, rewrites included. The rewrites still come from an LLM, and the passages they point to are the same LLM-chosen passages, so the model learns the benchmark rather than people. Adding BM25 also hurts on Najiz, because people rarely use the words of the law. The assistant keeps the starting e5 model with dense retrieval; the honest way to improve it is real user questions, which this project does not have.
+
+**Answering model**, ALLaM fine-tuned again on the rewritten questions with 12% "not found" examples instead of 25%:
+
+| | Cites the gold passage | Says "not found" when the law is missing | Says "not found" although the answer is there | Answer F1 |
+|---|---|---|---|---|
+| 25% "not found", original questions (step 3), test | 93% | **84%** | 7% | 0.80 |
+| 12% "not found", rewrites, test | **96%** | 40% | **2%** | 0.81 |
+| 25% "not found", original questions (step 3), Najiz | 55% | **86%** | 44% | **0.47** |
+| 12% "not found", rewrites, Najiz | **77%** | 46% | **11%** | 0.37 |
+
+Multiple choice with retrieved passages: 95.0% on test (step 3 adapter: 96.5%).
+
+On human questions the false "not found" rate falls from 44% to 11%, and the model now cites the right article for 77% of them instead of 55%. The price is the other failure: with the relevant article removed, it answers anyway more than half the time, usually from a neighbouring article. The share of "not found" examples is a dial between refusing too often and answering too readily. Part 6 trains a third point on the dial (18%).
