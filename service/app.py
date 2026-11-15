@@ -20,7 +20,7 @@ from pydantic import BaseModel, Field
 from sanad.serve import QUERY_PREFIX, ChatModel, Corpus, TextEncoder, ask
 
 ARTIFACTS = Path(os.environ.get("SANAD_ARTIFACTS", "artifacts"))
-MODEL_FILE = os.environ.get("SANAD_ENCODER", "text.int8.onnx")
+MODEL_FILE = os.environ.get("SANAD_ENCODER", "text.onnx")
 
 app = FastAPI(title="Sanad", description="Question answering over Saudi law, in Arabic, with the article it rests on. Not legal advice.")
 
