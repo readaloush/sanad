@@ -15,7 +15,7 @@ from pathlib import Path
 from .data import build
 from .llm import generate, load, render
 from .prompts import abstained, citations, rag_messages
-from .retrieval import Dense
+from .retrieval import BM25, Dense, Reranker, rrf
 
 QUESTIONS = [
     ("إذا لم أتفق مع المحامي على أتعابه، فمن يحدد المبلغ؟", True),
@@ -37,6 +37,8 @@ def main():
     ap.add_argument("--retriever", default="intfloat/multilingual-e5-base")
     ap.add_argument("--data", default="data")
     ap.add_argument("--out", default="results/demo.json")
+    ap.add_argument("--search", choices=["e5", "rerank"], default="e5",
+                    help="e5: dense e5-base, as in steps 3 to 6; rerank: BM25 + bge-m3 fused, then bge-reranker-v2-m3 (step 1's best)")
     a = ap.parse_args()
 
     import gc
@@ -45,10 +47,22 @@ def main():
 
     d = build(a.data)
     ps = [p for p in d.passages.values() if "alarb" in p.sources]
-    dense = Dense(a.retriever, [p.pid for p in ps], [p.text for p in ps])
-    ranked = dense.search([q for q, _ in QUESTIONS], k=3)
+    pids, texts = [p.pid for p in ps], [p.text for p in ps]
+    qs = [q for q, _ in QUESTIONS]
     by_id = {p.pid: p for p in ps}
-    del dense
+    if a.search == "e5":
+        dense = Dense(a.retriever, pids, texts)
+        ranked = dense.search(qs, k=3)
+    else:
+        dense = Dense("BAAI/bge-m3", pids, texts)
+        fused = rrf(BM25(pids, texts).search(qs, k=50), dense.search(qs, k=50))
+        del dense
+        gc.collect()
+        torch.cuda.empty_cache()
+        rr = Reranker()
+        ranked = [r[:3] for r in rr.rerank(qs, fused, {p.pid: p.text for p in ps}, top=20)]
+        del rr
+    dense = None
     gc.collect()
     torch.cuda.empty_cache()
 
