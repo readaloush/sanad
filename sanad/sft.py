@@ -18,6 +18,7 @@ import argparse
 import json
 import math
 import random
+import re
 import time
 from pathlib import Path
 
@@ -26,6 +27,7 @@ import torch
 from .data import build
 from .llm import ABSTAIN, rag_messages, render
 from .retrieval import BM25, Dense, rrf
+from .text import tokens
 
 TRAIN_CHARS = 700
 
@@ -34,7 +36,25 @@ def clip(t: str) -> str:
     return t if len(t) <= TRAIN_CHARS else t[:TRAIN_CHARS] + "…"
 
 
-def examples(d, ranked, n, p_unanswerable=0.25, k=3, seed=0, rewrites=None):
+SENT = re.compile(r"(?<=[.؛:\n])\s*")
+
+
+def support(passage: str, question: str, answer: str, max_chars: int = 260) -> str:
+    """The sentence of the passage that shares the most words with the question and answer: the text the answer rests on."""
+    ans, qs = set(tokens(answer)), set(tokens(question))
+    best, score = "", -1
+    for sent in SENT.split(passage):
+        sent = sent.strip(" -")
+        if len(sent) < 15:
+            continue
+        t = set(tokens(sent))
+        sc = 3 * len(ans & t) + len(qs & t)
+        if sc > score:
+            best, score = sent, sc
+    return best if len(best) <= max_chars else best[:max_chars].rsplit(" ", 1)[0] + "…"
+
+
+def examples(d, ranked, n, p_unanswerable=0.25, k=3, seed=0, rewrites=None, full=False):
     rng = random.Random(seed)
     held = {q.gold for s in ("dev", "test", "najiz") for q in d.questions[s]}
     text = {p: d.passages[p].text for p in d.passages}
@@ -50,7 +70,12 @@ def examples(d, ranked, n, p_unanswerable=0.25, k=3, seed=0, rewrites=None):
             ctx = [p for p in r[:k]]
             if q.gold not in ctx:
                 ctx[rng.randrange(k)] = q.gold
-            target = f"{q.answer.strip()} [{ctx.index(q.gold) + 1}]"
+            idx = ctx.index(q.gold) + 1
+            target = f"{q.answer.strip()} [{idx}]"
+            if full:
+                sup = support(text[q.gold], q.text, q.answer)
+                if sup:
+                    target = f"{q.answer.strip()}، إذ ينص النص [{idx}] على: «{sup}»"
         question = rewrites[q.qid] if rewrites else q.text
         out.append((rag_messages(question, [clip(text[p]) for p in ctx]), target))
     return out
@@ -70,6 +95,8 @@ def main():
     ap.add_argument("--max-len", type=int, default=1280)
     ap.add_argument("--rank", type=int, default=16)
     ap.add_argument("--p-unanswerable", type=float, default=0.25)
+    ap.add_argument("--full-answers", action="store_true",
+                    help="target = the short answer + the sentence of the cited passage it rests on, instead of the short answer alone")
     ap.add_argument("--rewrites", default="", help="train on the plain-language rewrites from sanad.rewrite instead of the original questions")
     a = ap.parse_args()
     out = Path(a.out)
@@ -92,7 +119,9 @@ def main():
     del dense
     torch.cuda.empty_cache()
 
-    ex = examples(d, ranked, a.n, p_unanswerable=a.p_unanswerable, rewrites=rw)
+    ex = examples(d, ranked, a.n, p_unanswerable=a.p_unanswerable, rewrites=rw, full=a.full_answers)
+    for _, target in ex[:4]:
+        print("example target:", target, flush=True)
     tok = AutoTokenizer.from_pretrained(a.model)
     if tok.pad_token is None:
         tok.pad_token = tok.eos_token
