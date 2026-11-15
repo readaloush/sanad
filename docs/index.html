@@ -102,8 +102,8 @@ footer{border-top:1px solid var(--rule);padding:28px 0 48px;color:var(--muted);f
     <section class="read" id="how">
       <h2>How it answers</h2>
       <div class="prose">
-        <p>Your question is turned into a vector by multilingual-e5-base and compared with every article in the corpus. The three closest articles go to ALLaM-7B, a language model trained by SDAIA, with one instruction: answer only from these texts, cite the one you used, and if none of them answers the question, say «لا أجد الإجابة في النصوص المتاحة» ("I can't find the answer in the available texts").</p>
-        <p>The examples above are real outputs on the 717 statute articles cited in ALARB court cases. Two questions ask about labour and traffic law, which are not in that collection, so the right answer is that sentence. The three columns are the same model before fine-tuning and after two fine-tuning runs that differ in one setting: how often, during training, the answer was missing from the texts.</p>
+        <p>For these examples the search combines word matching (BM25) with meaning-based search (bge-m3), and a reranker (bge-reranker-v2-m3) picks the three best articles from the top 20. Those three go to ALLaM-7B, a language model trained by SDAIA, with one instruction: answer only from these texts, cite the one you used, and if none of them answers the question, say «لا أجد الإجابة في النصوص المتاحة» ("I can't find the answer in the available texts").</p>
+        <p>The examples above are real outputs on the 717 statute articles cited in ALARB court cases. With the simpler search used in the experiments (multilingual-e5-base alone), the article that answers the question came back for only three of the six questions whose law is in the collection; with this search, for five. Two questions ask about labour and traffic law, which are not in that collection, so the right answer is that sentence. The three columns are the same model before fine-tuning and after two fine-tuning runs that differ in one setting: how often, during training, the answer was missing from the texts.</p>
       </div>
     </section>
 
