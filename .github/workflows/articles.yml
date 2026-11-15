@@ -1,0 +1,28 @@
+name: Build the demo's article index
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - sanad/export_articles.py
+      - .github/workflows/articles.yml
+
+permissions:
+  contents: write
+
+jobs:
+  articles:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install datasets numpy
+      - run: python -m sanad.export_articles --out docs/articles.json
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add docs/articles.json
+          git diff --cached --quiet || git commit -m "Build docs/articles.json from ALARB"
+          git push
