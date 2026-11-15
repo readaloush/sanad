@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sanad — Saudi law questions, answered with the article</title>
+<meta name="description" content="Sanad: an Arabic assistant that answers questions about Saudi law from the statute text, cites the article, and says when the law is not in front of it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600&family=Readex+Pro:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F5F6F3; --sheet:#FFFFFF; --ink:#1B2A2F; --muted:#5B6B70; --rule:#D5DBD8;
+  --seal:#1E6B52; --seal-soft:#E3EEE9; --mark:#F0E2B0; --refuse:#8C2F39; --refuse-soft:#F5E6E8;
+  --ui:"Readex Pro",system-ui,sans-serif; --law:"Noto Naskh Arabic","Readex Pro",serif;
+}
+*{box-sizing:border-box}
+html{background:var(--paper);color:var(--ink);font:400 17px/1.6 var(--ui)}
+body{margin:0}
+a{color:var(--seal)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--seal);outline-offset:3px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+header.top{padding:44px 0 20px;display:flex;align-items:baseline;gap:18px;flex-wrap:wrap}
+.name{font-weight:600;font-size:1.5rem;letter-spacing:-.01em;margin:0}
+.name span{font-family:var(--law);font-weight:600;color:var(--seal);margin-inline-start:.35em}
+.top p{margin:0;color:var(--muted);max-width:60ch}
+.top nav{margin-inline-start:auto;display:flex;gap:18px;font-size:.92rem}
+
+/* the explorer: the memorable part */
+.explorer{display:grid;grid-template-columns:minmax(260px,330px) 1fr;gap:28px;padding:18px 0 56px}
+.qs{list-style:none;margin:0;padding:0;direction:rtl;border-inline-start:1px solid var(--rule)}
+.qs button{all:unset;box-sizing:border-box;cursor:pointer;display:block;width:100%;padding:12px 16px 12px 10px;font:400 1rem/1.6 var(--law);color:var(--ink);border-inline-start:3px solid transparent;margin-inline-start:-2px}
+.qs button:hover{background:var(--sheet)}
+.qs button[aria-selected="true"]{border-color:var(--seal);background:var(--sheet);font-weight:600}
+.qs .tag{display:block;font:400 .74rem/1.4 var(--ui);color:var(--muted);direction:ltr;text-align:right}
+.qhead{margin:0 0 18px}
+.qhead h2{font:600 1.65rem/1.5 var(--law);direction:rtl;text-align:right;margin:0}
+.qhead p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+.answers{display:grid;grid-template-columns:repeat(var(--cols,3),1fr);gap:14px}
+.ans{background:var(--sheet);border:1px solid var(--rule);border-radius:6px;padding:14px 16px 16px;display:flex;flex-direction:column}
+.ans h3{font:500 .86rem/1.4 var(--ui);margin:0 0 2px}
+.ans .how{font-size:.78rem;color:var(--muted);margin:0 0 10px}
+.ans .text{font:400 1.06rem/1.85 var(--law);direction:rtl;text-align:right;margin:0;flex:1}
+.ans.nf .text{color:var(--refuse)}
+.verdict{margin-top:12px;font-size:.78rem;padding:3px 8px;border-radius:3px;align-self:flex-start}
+.verdict.good{background:var(--seal-soft);color:var(--seal)}
+.verdict.bad{background:var(--refuse-soft);color:var(--refuse)}
+.cite{all:unset;cursor:pointer;font:500 .8rem/1 var(--ui);background:var(--seal-soft);color:var(--seal);padding:2px 6px;border-radius:3px;margin:0 2px;direction:ltr;display:inline-block}
+.cite:hover,.cite:focus-visible{background:var(--seal);color:#fff}
+.note{margin:18px 0 0;max-width:72ch;font-size:.95rem;border-inline-start:3px solid var(--rule);padding-inline-start:14px}
+.sources{margin-top:22px}
+.sources > p{font-size:.86rem;color:var(--muted);margin:0 0 8px}
+.art{background:var(--sheet);border:1px solid var(--rule);border-radius:6px;padding:12px 16px;margin-bottom:10px;direction:rtl;transition:background .25s}
+.art.lit{background:var(--mark);border-color:#D9C47E}
+.art header{display:flex;gap:10px;align-items:baseline;font:500 .9rem/1.4 var(--ui)}
+.art header b{font-family:var(--ui);color:var(--seal)}
+.art .body{font:400 1rem/1.9 var(--law);margin:6px 0 0;max-height:7.6em;overflow:hidden;position:relative}
+.art.open .body{max-height:none}
+.art .more{all:unset;cursor:pointer;font:400 .78rem var(--ui);color:var(--seal);margin-top:4px;display:inline-block}
+
+/* reading part */
+section.read{border-top:1px solid var(--rule);padding:48px 0;display:grid;grid-template-columns:minmax(200px,300px) 1fr;gap:28px}
+section.read h2{font:600 1.2rem/1.4 var(--ui);margin:0}
+.prose{max-width:68ch}
+.prose p{margin:0 0 1em}
+table{border-collapse:collapse;width:100%;font-size:.9rem;margin:6px 0 22px;background:var(--sheet)}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-weight:500;color:var(--muted);font-size:.8rem}
+td.n{font-variant-numeric:tabular-nums;white-space:nowrap}
+caption{text-align:left;font-weight:500;padding:0 0 6px;caption-side:top}
+footer{border-top:1px solid var(--rule);padding:28px 0 48px;color:var(--muted);font-size:.86rem}
+.empty{color:var(--muted)}
+
+@media (max-width:900px){
+  .explorer{grid-template-columns:1fr}
+  .qs{display:flex;overflow-x:auto;border:0;border-bottom:1px solid var(--rule)}
+  .qs li{flex:0 0 240px}
+  table{font-size:.8rem}
+  th,td{padding:6px}
+  .qs button{border-inline-start:0;border-bottom:3px solid transparent;margin:0}
+  .qs button[aria-selected="true"]{border-color:var(--seal)}
+  .answers{grid-template-columns:1fr}
+  section.read{grid-template-columns:1fr;gap:12px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1 class="name">Sanad<span>سند</span></h1>
+    <p>Ask about Saudi law in plain Arabic. It finds the statute article, answers from it, cites it, and says when the law is not there.</p>
+    <nav><a href="https://github.com/readaloush/sanad">Code and results</a><a href="https://readaloush.com">Read Aloush</a></nav>
+  </header>
+
+  <main>
+    <div class="explorer" id="explorer">
+      <ul class="qs" role="tablist" aria-label="Example questions" id="qs"></ul>
+      <div role="tabpanel" id="panel" aria-live="polite"><p class="empty">Loading the example answers…</p></div>
+    </div>
+
+    <section class="read" id="how">
+      <h2>How it answers</h2>
+      <div class="prose">
+        <p>Your question is turned into a vector by multilingual-e5-base and compared with every article in the corpus. The three closest articles go to ALLaM-7B, a language model trained by SDAIA, with one instruction: answer only from these texts, cite the one you used, and if none of them answers the question, say «لا أجد الإجابة في النصوص المتاحة» ("I can't find the answer in the available texts").</p>
+        <p>The examples above are real outputs on the 717 statute articles cited in ALARB court cases. Two questions ask about labour and traffic law, which are not in that collection, so the right answer is that sentence. The three columns are the same model before fine-tuning and after two fine-tuning runs that differ in one setting: how often, during training, the answer was missing from the texts.</p>
+      </div>
+    </section>
+
+    <section class="read" id="results">
+      <h2>What the numbers say</h2>
+      <div class="prose">
+        <table>
+          <caption>Finding the right article, among 5,929 passages</caption>
+          <thead><tr><th>Retriever</th><th>LLM-written questions<br>top 1 / top 10</th><th>Questions people asked<br>top 1 / top 10</th></tr></thead>
+          <tbody>
+            <tr><td>BM25 (word matching)</td><td class="n">79.0 / 94.6</td><td class="n">40.5 / 70.9</td></tr>
+            <tr><td>multilingual-e5-base</td><td class="n">74.2 / 94.3</td><td class="n">63.3 / 87.3</td></tr>
+            <tr><td>e5-base, fine-tuned on LLM-written questions</td><td class="n">82.1 / 97.4</td><td class="n">58.2 / 81.0</td></tr>
+            <tr><td>BM25 + bge-m3 + reranker</td><td class="n">85.9 / 98.4</td><td class="n">64.6 / 93.7</td></tr>
+          </tbody>
+        </table>
+        <table id="gen-table">
+          <caption>Answering, on the 79 questions people asked (Najiz)</caption>
+          <thead><tr><th>ALLaM-7B</th><th>Cites the right article</th><th>Says "not found" when the law is missing</th><th>Says "not found" although the answer is there</th></tr></thead>
+          <tbody>
+            <tr><td>before fine-tuning</td><td class="n">26%</td><td class="n">18%</td><td class="n">2%</td></tr>
+            <tr><td>fine-tuned, 25% "not found" examples</td><td class="n">55%</td><td class="n">86%</td><td class="n">44%</td></tr>
+            <tr><td>fine-tuned on plain-language rewrites, 12%</td><td class="n">77%</td><td class="n">46%</td><td class="n">11%</td></tr>
+            <tr><td>the same, 18%</td><td class="n">56%</td><td class="n">86%</td><td class="n">44%</td></tr>
+          </tbody>
+        </table>
+        <p>The test questions most papers report on were written by a language model reading the passage, so they reuse its words. On those, word matching wins and fine-tuning helps. On the 79 questions real people asked, both turn against you: the fine-tuned retriever finds fewer of the right articles, and a model trained to refuse when the wording does not match refuses when people simply use different words. The same pattern showed up in two different models. The honest test is the human one, and it is small: one question is 1.3 points.</p>
+        <p>Before fine-tuning, ALLaM answered almost every question whose law it had not been given, and rarely said where its answer came from. Fine-tuning fixes the citations. How often it should refuse is the hard part: with 12% “not found” examples in training it rarely refuses wrongly but often answers when the law is missing; with 18% it is back to refusing almost half the questions it could answer. Training the dial does not move it smoothly.</p>
+      </div>
+    </section>
+
+    <section class="read" id="limits">
+      <h2>What it is not</h2>
+      <div class="prose">
+        <p>It is not legal advice and not a complete body of Saudi law. The served collection is the 717 articles that commercial court cases cite, mostly from the laws of civil procedure, companies, commercial courts, evidence, bankruptcy and the legal profession. The full code, every number, and the notebooks that produced them are in the repository.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Built by <a href="https://readaloush.com">Read Aloush</a>. Data: ArabLegalEval and Najiz QA (THIQAH and KAUST), ALARB (Apache-2.0). Models: ALLaM-7B-Instruct (SDAIA), multilingual-e5-base.
+  </footer>
+</div>
+
+<script>
+const RUNS=[
+  {key:"before",title:"Before fine-tuning",how:"ALLaM-7B-Instruct as released"},
+  {key:"lora2",title:"Fine-tuned, 12% not found",how:"trained on plain-language questions"},
+  {key:"lora3",title:"Fine-tuned, 18% not found",how:"the same, refusing a little more often"}
+];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let rows=[], cur=0;
+
+function verdict(row,a){
+  if(!a) return ["",""];
+  if(!row.in_corpus) return a.not_found ? ['good','Right: this law is not in the collection'] : ['bad','Answered although the law is not here'];
+  if(row.retrieved_answering_article===false) return a.not_found ? ['good','Right for the texts it was given'] : ['bad','Answered without the article that answers this'];
+  if(a.not_found) return ['bad','Said “not found” although the answer is there'];
+  return a.cited && a.cited.length ? ['good','Answered with a citation'] : ['bad','Answered without saying where from'];
+}
+function answerHtml(text){
+  return esc(text).replace(/\[(\d)\]/g,(m,n)=>`<button class="cite" data-n="${n}" aria-label="Show article ${n}">${n}</button>`);
+}
+function render(i){
+  cur=i;
+  document.querySelectorAll('#qs button').forEach((b,j)=>{b.setAttribute('aria-selected',j===i);b.tabIndex=j===i?0:-1});
+  const row=rows[i];
+  const runs=RUNS.filter(r=>row[r.key]);
+  document.getElementById('panel').innerHTML=`
+    <div class="qhead"><h2>${esc(row.question)}</h2>
+      <p>${!row.in_corpus?'This law is not in the collection, so the right answer is “not found”.':row.retrieved_answering_article===false?'The answer is in the collection, but the retriever did not bring the article that holds it.':'The retriever found the article that holds the answer.'}</p></div>
+    <div class="answers" style="--cols:${runs.length}">${runs.map(r=>{
+      const a=row[r.key]; const v=verdict(row,a);
+      return `<article class="ans${a.not_found?' nf':''}"><h3>${r.title}</h3><p class="how">${r.how}</p>
+        <p class="text">${answerHtml(a.answer)}</p><span class="verdict ${v[0]}">${v[1]}</span></article>`}).join('')}</div>
+    ${row.note?`<p class="note">${esc(row.note)}</p>`:''}
+    <div class="sources"><p>The three articles the retriever found and gave the model</p>
+      ${row.sources.map((s,k)=>`<div class="art" id="art${k+1}"><header><b>[${k+1}]</b><span>${esc(s.law)}، المادة ${esc(s.article)}</span></header>
+        <p class="body">${esc(s.text)}</p>${s.text.length>260?'<button class="more">Show the whole article</button>':''}</div>`).join('')}</div>`;
+}
+document.addEventListener('click',e=>{
+  const c=e.target.closest('.cite');
+  if(c){const el=document.getElementById('art'+c.dataset.n); if(el){document.querySelectorAll('.art.lit').forEach(x=>x.classList.remove('lit')); el.classList.add('lit'); el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest'});}}
+  const m=e.target.closest('.more');
+  if(m){const a=m.closest('.art'); a.classList.toggle('open'); m.textContent=a.classList.contains('open')?'Show less':'Show the whole article';}
+});
+document.getElementById('qs').addEventListener('keydown',e=>{
+  if(!['ArrowDown','ArrowUp','ArrowLeft','ArrowRight'].includes(e.key)) return;
+  e.preventDefault(); const d=(e.key==='ArrowDown'||e.key==='ArrowLeft')?1:-1;
+  const n=(cur+d+rows.length)%rows.length; render(n); document.querySelectorAll('#qs button')[n].focus();
+});
+fetch('demo.json').then(r=>{if(!r.ok) throw 0; return r.json()}).then(d=>{
+  rows=d;
+  document.getElementById('qs').innerHTML=rows.map((r,i)=>`<li role="presentation"><button role="tab" id="q${i}" aria-controls="panel">${esc(r.question)}<span class="tag">${r.in_corpus?'in the collection':'not in the collection'}</span></button></li>`).join('');
+  document.querySelectorAll('#qs button').forEach((b,i)=>b.addEventListener('click',()=>render(i)));
+  render(0);
+}).catch(()=>{document.getElementById('panel').innerHTML='<p class="empty">The example answers did not load. They are in docs/demo.json in the repository.</p>'});
+</script>
+</body>
+</html>
