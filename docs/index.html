@@ -68,8 +68,24 @@ th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);verti
 th{font-weight:500;color:var(--muted);font-size:.8rem}
 td.n{font-variant-numeric:tabular-nums;white-space:nowrap}
 caption{text-align:left;font-weight:500;padding:0 0 6px;caption-side:top}
+/* search box */
+section.search{border-top:1px solid var(--rule);padding:48px 0;display:grid;grid-template-columns:minmax(200px,300px) 1fr;gap:28px}
+section.search h2{font:600 1.2rem/1.4 var(--ui);margin:0}
+section.search .side p{color:var(--muted);font-size:.9rem;margin:8px 0 0}
+.askrow{display:flex;gap:10px}
+.askrow input{flex:1;font:400 1.1rem/1.6 var(--law);direction:rtl;padding:10px 14px;border:1px solid var(--rule);border-radius:6px;background:var(--sheet);color:var(--ink)}
+.askrow input:focus-visible{outline:2px solid var(--seal);outline-offset:1px}
+.askrow button{font:500 .95rem var(--ui);padding:0 18px;border-radius:6px;border:0;background:var(--seal);color:#fff;cursor:pointer}
+.tries{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0;direction:rtl}
+.tries button{all:unset;cursor:pointer;font:400 .9rem/1.5 var(--law);padding:3px 10px;border:1px solid var(--rule);border-radius:999px;background:var(--sheet)}
+.tries button:hover,.tries button:focus-visible{border-color:var(--seal)}
+#results{margin-top:18px}
+#results .art mark{background:var(--mark);color:inherit;padding:0 1px}
+#results .status{color:var(--muted);font-size:.9rem;margin:0 0 10px}
+@media (max-width:900px){section.search{grid-template-columns:1fr;gap:12px}}
 footer{border-top:1px solid var(--rule);padding:28px 0 48px;color:var(--muted);font-size:.86rem}
 .empty{color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 
 @media (max-width:900px){
   .explorer{grid-template-columns:1fr}
@@ -98,6 +114,28 @@ footer{border-top:1px solid var(--rule);padding:28px 0 48px;color:var(--muted);f
       <ul class="qs" role="tablist" aria-label="Example questions" id="qs"></ul>
       <div role="tabpanel" id="panel" aria-live="polite"><p class="empty">Loading the example answers…</p></div>
     </div>
+
+    <section class="search" id="search">
+      <div class="side">
+        <h2>Search the articles yourself</h2>
+        <p>Type a question in Arabic. Your browser finds the closest of the 717 articles by word matching (BM25). This finds articles; it does not write an answer, because the language model needs a GPU server.</p>
+        <p>Word matching is the weakest search in this project: it found the right article first for 41% of the questions people asked, against 63% for the model-based search used in the examples above. Questions that use the law's own words work best.</p>
+      </div>
+      <div>
+        <form class="askrow" id="askform" role="search">
+          <label for="ask" class="sr">Your question</label>
+          <input id="ask" type="search" dir="rtl" lang="ar" placeholder="اكتب سؤالك هنا…" autocomplete="off">
+          <button type="submit">Search</button>
+        </form>
+        <div class="tries" aria-label="Example questions">
+          <button type="button">متى تسقط الدعوى بمضي المدة؟</button>
+          <button type="button">ما شروط قبول شهادة الشاهد؟</button>
+          <button type="button">من يدفع مصاريف التنفيذ؟</button>
+          <button type="button">كيف أعترض على حكم المحكمة التجارية؟</button>
+        </div>
+        <div id="results" aria-live="polite"></div>
+      </div>
+    </section>
 
     <section class="read" id="how">
       <h2>How it answers</h2>
@@ -201,6 +239,51 @@ fetch('demo.json').then(r=>{if(!r.ok) throw 0; return r.json()}).then(d=>{
   document.querySelectorAll('#qs button').forEach((b,i)=>b.addEventListener('click',()=>render(i)));
   render(0);
 }).catch(()=>{document.getElementById('panel').innerHTML='<p class="empty">The example answers did not load. They are in docs/demo.json in the repository.</p>'});
+
+// ---- in-browser search: the same normalisation, light stemming and BM25 as sanad/text.py ----
+const STOP=new Set("في من على الى إلى عن او أو ان أن إن ما لا لم لن هذا هذه ذلك تلك التي الذي الذين و ف ب ل ك ثم قد كل مع عند بين هو هي هم كان كانت يكون تكون اي أي غير بعد قبل حتى اذا إذا".split(" ").map(w=>norm(w)));
+const PREF=["وبال","وكال","ولل","وال","بال","كال","فال","لل","ال"];
+function norm(t){
+  t=t.normalize("NFKC").replace(/[ؐ-ًؚ-ٰٟۖ-ۭ]/g,"").replace(/ـ/g,"");
+  t=t.replace(/[آأإٱ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه");
+  return t.replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[۰-۹]/g,d=>"۰۱۲۳۴۵۶۷۸۹".indexOf(d)).toLowerCase();
+}
+function stem(w){for(const p of PREF){if(w.startsWith(p)&&w.length-p.length>=3)return w.slice(p.length)}return (w.startsWith("و")&&w.length>=5)?w.slice(1):w}
+function toks(t){return (norm(t).match(/[\p{L}\p{N}_]+/gu)||[]).filter(w=>!STOP.has(w)).map(stem)}
+let ARTS=null, IDX=null;
+async function loadIndex(){
+  if(IDX) return IDX;
+  const r=await fetch('articles.json'); if(!r.ok) throw new Error('articles');
+  ARTS=await r.json();
+  const docs=ARTS.map(a=>toks(a.text)), df=new Map(); let total=0;
+  for(const d of docs){total+=d.length; for(const w of new Set(d)) df.set(w,(df.get(w)||0)+1);}
+  const N=docs.length, avg=total/N, idf=new Map();
+  for(const [w,n] of df) idf.set(w,Math.log((N-n+0.5)/(n+0.5)+1));
+  const tf=docs.map(d=>{const m=new Map(); for(const w of d) m.set(w,(m.get(w)||0)+1); return m;});
+  IDX={tf,len:docs.map(d=>d.length),avg,idf}; return IDX;
+}
+function bm25(q,k=5){
+  const {tf,len,avg,idf}=IDX, qs=[...new Set(toks(q))], k1=1.2, b=0.75;
+  const sc=tf.map((m,i)=>{let s=0; for(const w of qs){const f=m.get(w); if(f) s+=idf.get(w)*f*(k1+1)/(f+k1*(1-b+b*len[i]/avg));} return [s,i]});
+  return {qs, hits: sc.filter(x=>x[0]>0).sort((a,b)=>b[0]-a[0]).slice(0,k)};
+}
+function highlight(text,qs){
+  const set=new Set(qs);
+  return text.split(/(\s+)/).map(w=>{const t=toks(w); return t.length&&t.some(x=>set.has(x))?`<mark>${esc(w)}</mark>`:esc(w)}).join("");
+}
+async function runSearch(q){
+  const out=document.getElementById('results');
+  q=q.trim(); if(!q){out.innerHTML=''; return;}
+  out.innerHTML='<p class="status">Loading the 717 articles…</p>';
+  try{ await loadIndex(); }catch(e){ out.innerHTML='<p class="status">The articles did not load. Reload the page and try again.</p>'; return; }
+  const {qs,hits}=bm25(q);
+  if(!hits.length){ out.innerHTML='<p class="status">No article shares a word with this question. Try other words, or a question about procedure, companies, evidence, bankruptcy, enforcement or lawyers.</p>'; return; }
+  out.innerHTML=`<p class="status">The ${hits.length} closest articles, best first. Highlighted words match your question.</p>`+
+    hits.map(([s,i],k)=>{const a=ARTS[i]; return `<div class="art"><header><b>${k+1}</b><span>${esc(a.law)}، المادة ${esc(a.article)}</span></header><p class="body">${highlight(a.text,qs)}</p>${a.text.length>260?'<button class="more">Show the whole article</button>':''}</div>`}).join("");
+}
+document.getElementById('askform').addEventListener('submit',e=>{e.preventDefault(); runSearch(document.getElementById('ask').value);});
+document.querySelectorAll('.tries button').forEach(b=>b.addEventListener('click',()=>{document.getElementById('ask').value=b.textContent; runSearch(b.textContent);}));
+document.getElementById('ask').addEventListener('focus',()=>{loadIndex().catch(()=>{})},{once:true});
 </script>
 </body>
 </html>
